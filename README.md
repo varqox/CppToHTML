@@ -1,6 +1,4 @@
-Aho-Corasick
+CppToHTML
 ============
 
-Aho–Corasick is a string searching in text algorithm
-
-Full implementation in aho.cpp file
+C++ syntax highlight to HTML code
