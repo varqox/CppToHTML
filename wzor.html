@@ -1,20 +1,20 @@
-
-<!-- saved from url=(0043)file:///home/kwazar/Pulpit/unlint/test.html -->
-<html><head>
-
+<html>
+<head>
 <meta charset="utf-8">
 <style>
-div:after {
-	content: ".";
-	display: inline-block;
-	clear: both;
-	visibility: hidden;
-	line-height: 0;
-	height: 0;
+div:after
+{
+  content: ".";
+  display: inline-block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
 }
 
-div {
-	display: inline-block;
+div
+{
+  display: inline-block;
 }
 
 body
@@ -34,7 +34,7 @@ body
 .cpp_code
 {
   text-align: left;
-	margin: 0;
+  margin: 0;
   margin-left: 0px;
   overflow: auto;
   padding-left: 1em;
@@ -63,6 +63,7 @@ body
 .p5{color: #b8b8b8;}
 .p6{color: #ae81ff;}
 .p7{color: #e6db74;}
+.p8{color: gray;}
 </style>
 </head>
 <body>
@@ -94,10 +95,20 @@ body
 26
 27
 28
+29
+30
+31
+32
+33
+34
+35
 </pre>
 <pre class="cpp_code"><span class="p1">#include <span class="p7">&lt;iostream&gt;</span></span>
 <span class="p1">#include <span class="p7">&lt;vector&gt;</span></span>
 <span class="p1">#include <span class="p7">&lt;stdio.h&gt;</span></span>
+
+<span class="p1">#define trol(a,b)\
+cout &lt;&lt; a &lt;&lt; b</span>
 
 <span class="p3">using</span> <span class="p4">namespace</span> std<span class="p5">;</span>
 <span class="p3">typedef</span> <span class="p4">long double</span> lli<span class="p5">;</span>
@@ -107,19 +118,23 @@ body
   vector<span class="p5">&lt;</span><span class="p4">int</span><span class="p5">&gt;</span> lol<span class="p5">;
 };</span>
 
-<span class="p4">void</span> <span class="p1">trol</span><span class="p5">()
+<span class="p4">void</span> <span class="p1">trol</span><span class="p5">() <span class="p8">/*
+multiline
+comment
+:D
+*/</span>
 {</span>
   <span class="p3">return</span><span class="p5">;
 }</span>
 
-<span class="p4">int</span> <span class="p1">main</span><span class="p5">()</span>
+<span class="p4">int</span> <span class="p1">main</span><span class="p5">()</span> <span class="p8">// oneline comment</span>
 <span class="p5">{</span>
     <span class="p4">lli</span> trol<span class="p5">=</span><span class="p6">0.0</span><span class="p5">;</span>
     <span class="p2">std</span><span class="p5">::</span>cout <span class="p5">&lt;&lt;</span> trol <span class="p5">&lt;&lt;</span><span class="p7">"<span class="p6">\n</span>lol"</span><span class="p5">;</span>
     <span class="p3">if</span><span class="p5">(</span>trol<span class="p5">==</span><span class="p6">0LL</span><span class="p5">)</span>
     <span class="p3">for</span><span class="p5">(</span><span class="p4">int</span> i<span class="p5">=</span><span class="p6">0</span><span class="p5">;</span> i<span class="p5">&lt;</span><span class="p6">1</span><span class="p5">; ++</span>i<span class="p5">)</span>
         <span class="p3">if</span><span class="p5">(</span>i<span class="p5">==</span><span class="p6">0</span><span class="p5">)</span> <span class="p3">break</span><span class="p5">;</span>
-    <span class="p4">printf</span><span class="p5">(<span class="p7">"<span class="p6">\t</span>%d<span class="p6">\n</span>"</span>,</span> <span class="p6">-1</span><span class="p5">);</span>
+    <span class="p4">printf</span><span class="p5">(<span class="p7">"<span class="p6">\t</span>%d<span class="p6">\n%c</span>"</span>,</span> <span class="p6">-1</span><span class="p5">, <span class="p7">'<span class="p6">\n</span>'</span>);</span>
 <span class="p3">return</span> <span class="p6">0</span><span class="p5">;
 }</span>
 </pre>
@@ -131,5 +146,6 @@ body
 <p class="p5">Test: p5</p>
 <p class="p6">Test: p6</p>
 <p class="p7">Test: p7</p>
+<p class="p8">Test: p8</p>
 </body>
 </html>

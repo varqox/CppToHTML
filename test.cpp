@@ -13,19 +13,23 @@ class troll
   vector<int> lol;
 };
 
-void trol()
+void trol() /*
+multiline
+comment
+:D
+*/
 {
   return;
 }
 
-int main()
+int main() // oneline comment
 {
-	trol(0,1);
+    trol(0,1);
     lli trol=0.0;
     std::cout << trol <<"\nlol";
     if(trol==0LL)
     for(int i=0; i<1; ++i)
         if(i==0) break;
-    printf("\t%d\n", -1);
+    printf("\t%d\n%c", -1, '\n');
 return 0;
 }
