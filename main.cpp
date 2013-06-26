@@ -5,6 +5,11 @@
 
 using namespace std;
 
+string code_coloring(const string& code)
+{
+	return string("");
+}
+
 int main(int argc, char **argv)
 {
 	ios_base::sync_with_stdio(false);
