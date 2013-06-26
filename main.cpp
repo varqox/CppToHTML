@@ -2,8 +2,20 @@
 #include <fstream>
 #include <vector>
 #include <queue>
+#include <stack>
 
 using namespace std;
+
+/*
+p1 - green
+p2 - orange
+p3 - red
+p4 - turquoise
+p5 - light gray
+p6 - purple
+p7 - yellow
+p8 - gray
+*/
 
 namespace aho
 {
@@ -11,7 +23,7 @@ namespace aho
 	{
 		struct node
 		{
-			int E[256], fail, long_sh_pat, pattern_id; // fail pointer, max shorter patter, pattern id
+			int E[256], fail, long_sh_pat, pattern_id, depth; // fail pointer, max shorter patter, pattern id
 			bool is_pattern; // is pattern end in this vertex
 			char color; // highlight color
 			unsigned char character; // this node character
@@ -46,6 +58,7 @@ namespace aho
 			graph[ver].is_pattern=true;
 			graph[ver].pattern_id=id;
 			graph[ver].color=color;
+			graph[ver].depth=word.size();
 		}
 
 		void add_fails() // and the longest shorter patterns, based on BFS algorithm
@@ -89,10 +102,7 @@ namespace aho
 
 	void find(const string& text)
 	{
-		vector<tree::node>().swap(tree::graph); // clear tree::graph
 		vector<int>(text.size()).swap(fin); // clear fin
-		tree::init(); // initialize tree
-		tree::add_fails(); // add fails edges
 		int act=0, pat; // actual node - root
 		for(int s=text.size(), i=0; i<s; ++i)
 		{
@@ -102,7 +112,7 @@ namespace aho
 				act=tree::graph[act].E[text[i]];
 			if(tree::graph[act].is_pattern) // if actual node is pattern, then add it to fin
 			{
-				fin[i]=tree::graph[act].pattern_id;
+				fin[i-tree::graph[act].depth+1]=act;
 			}
 			else
 			{
@@ -111,7 +121,7 @@ namespace aho
 				{
 					if(tree::graph[pat].is_pattern)
 					{
-						fin[i]=tree::graph[pat].pattern_id; // add pat node to fin
+						fin[i-tree::graph[pat].depth+1]=tree::graph[pat].pattern_id; // add pat node to fin
 						break;
 					}
 					pat=tree::graph[pat].long_sh_pat; // go to the next pattern
@@ -121,9 +131,97 @@ namespace aho
 	}
 }
 
+string to_string(int a)
+{
+	stack<char> st;
+	while(a>0)
+	{
+		st.push('0'+a%10);
+		a/=10;
+	}
+	string w;
+	while(!st.empty())
+	{
+		w+=st.top();
+		st.pop();
+	}
+	if(w.empty()) w="0";
+return w;
+}
+
 string synax_highlight(const string& code)
 {
-return code;
+	vector<aho::tree::node>().swap(aho::tree::graph); // clear tree::graph
+	aho::tree::init(); // initialize tree
+	fstream keys_file("patterns/red_keys.txt", ios::in);
+	string key;
+	while(keys_file.good())
+	{
+		getline(keys_file,key);
+		aho::tree::add_word(key,0,5);
+	}
+	keys_file.close();
+	keys_file.open("patterns/keywords.txt", ios::in);
+	while(keys_file.good())
+	{
+		getline(keys_file,key);
+		aho::tree::add_word(key,0,3);
+	}
+	keys_file.close();
+	keys_file.open("patterns/types.txt", ios::in);
+	while(keys_file.good())
+	{
+		getline(keys_file,key);
+		aho::tree::add_word(key,0,4);
+	}
+	keys_file.close();
+	aho::tree::add_fails(); // add fails edges
+	aho::find(code);
+	string ret;
+	for(int cl=code.size(), i=0; i<cl; ++i)
+	{
+		//if pattern isn't included in any name (front)
+		if(aho::fin[i]!=0 && (aho::tree::graph[aho::fin[i]].color==5 || i==0 || !(code[i-1]=='_' || (code[i-1]>='A' && code[i-1]<='Z') || (code[i-1]>='a' && code[i-1]<='z'))))
+		{
+			int end=i+aho::tree::graph[aho::fin[i]].depth;
+			//if pattern isn't included in any name (end)
+			if(aho::tree::graph[aho::fin[i]].color!=5 && (end>=cl || code[end]=='_' || (code[end]>='A' && code[end]<='Z') || (code[end]>='a' && code[end]<='z')))
+			{
+				switch(code[i])
+				{
+					case '<': ret+="&lt;";break;
+					case '>': ret+="&gt;";break;
+					case '&': ret+="&amp;";break;
+					default: ret+=code[i];break;
+				}
+				continue;
+			}
+			ret+="<span class=\"p"+to_string(aho::tree::graph[aho::fin[i]].color)+"\">";
+			for(; i<end; ++i)
+			{
+				switch(code[i])
+				{
+					case '<': ret+="&lt;";break;
+					case '>': ret+="&gt;";break;
+					case '&': ret+="&amp;";break;
+					default: ret+=code[i];break;
+				}
+			}
+			ret+="</span>";
+			--i;
+		}
+		else
+		{
+			switch(code[i])
+			{
+				case '<': ret+="&lt;";break;
+				case '>': ret+="&gt;";break;
+				case '&': ret+="&amp;";break;
+				default: ret+=code[i];break;
+			}
+		}
+	}
+return ret;
 }
 
 string code_coloring(const string& code) // coloring comments, preprocesor, chars and strings
@@ -209,7 +307,7 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 			ret+=str_or_char;
 			ret+="</span>";
 		}
-		else if(code[i]>='0' && code[i]<='9' && (i==0 || !code[i]=='_' || !(code[i]>='A' && code[i]<='Z') || !(code[i]>='a' && code[i]<='z'))) // numbers
+		else if(code[i]>='0' && code[i]<='9' && (i==0 || !(code[i-1]=='_' || (code[i-1]>='A' && code[i-1]<='Z') || (code[i-1]>='a' && code[i-1]<='z')))) // numbers
 		{
 			ret+=synax_highlight(rest);
 			rest="";
@@ -262,7 +360,7 @@ int main(int argc, char **argv)
 		output.open((file_name+".html").c_str(), ios::out);
 		string input, lol;
 		int i=2;
-		output << "<html>\n<head>\n<meta charset=\"utf-8\">\n<style>\ndiv:after\n{\n	content: \".\";\n	display: inline-block;\n	clear: both;\n	visibility: hidden;\n	line-height: 0;\n	height: 0;\n}\n\ndiv\n{\n	display: inline-block;\n}\n\nbody\n{\n  background: #272822;\n  color: #f8f8f2;\n  font-family: Helvetica, Arial, sans-serif;\n  font-size: 14px;\n}\n.code\n{\n  width: 40em;\n  border: 2px solid #49483e;\n  border-radius: 4px;\n}\n\n.cpp_code\n{\n  text-align: left;\n	margin: 0;\n  margin-left: 0px;\n  overflow: auto;\n  padding-left: 1em;\n  padding-bottom: 5px;\n  padding-top: 5px;\n  padding-right: 5px;\n  border-left: 2px solid #49483e;\n}\n\n.num_lines\n{\n  color: #8f908a;\n  float: left;\n  margin: 0px;\n  text-align: right;\n  padding-left: 3px;\n  padding-right: 5px;\n  padding-bottom: 5px;\n  padding-top: 5px;\n}\n\n.p1{color: #a6e22e;}\n.p2{color: #ff9b4b;}\n.p3{color: #f92672;}\n.p4{color: #66d9ef;}\n.p5{color: #b8b8b8;}\n.p6{color: #ae81ff;}\n.p7{color: #e6db74;}\n.p8{color: gray;}\n</style>\n</head>\n<body>\n<div class=\"code\">\n<pre class=\"num_lines\">\n";
+		output << "<html>\n<head>\n<meta charset=\"utf-8\">\n<style>\ndiv:after\n{\n	content: \".\";\n	display: inline-block;\n	clear: both;\n	visibility: hidden;\n	line-height: 0;\n	height: 0;\n}\n\ndiv\n{\n	display: inline-block;\n}\n\nbody\n{\n  background: #272822;\n  color: #f8f8f2;\n  font-family: Helvetica, Arial, sans-serif;\n  font-size: 14px;\n}\n.code\n{\n  width: 40em;\n  border: 2px solid #49483e;\n  border-radius: 4px;\n}\n\n.cpp_code\n{\n  text-align: left;\n	margin: 0;\n  margin-left: 0px;\n  overflow: auto;\n  padding-left: 1em;\n  padding-bottom: 5px;\n  padding-top: 5px;\n  padding-right: 5px;\n  border-left: 2px solid #49483e;\n}\n\n.num_lines\n{\n  color: #8f908a;\n  float: left;\n  margin: 0px;\n  text-align: right;\n  padding-left: 3px;\n  padding-right: 5px;\n  padding-bottom: 5px;\n  padding-top: 5px;\n}\n\n.p1{color: #a6e22e;}\n.p2{color: #ff9b4b;}\n.p3{color: #f92672;}\n.p4{color: #66d9ef;}\n.p5{color: #B15555;}\n.p6{color: #ae81ff;}\n.p7{color: #e6db74;}\n.p8{color: gray;}\n</style>\n</head>\n<body>\n<div class=\"code\">\n<pre class=\"num_lines\">\n";
 		if(!file.eof())
 		{
 			getline(file, input);
