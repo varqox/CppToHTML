@@ -362,6 +362,61 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 return ret;
 }
 
+void compress(string file_name)
+{
+	fstream file;
+	file.open(file_name.c_str(), ios::in);
+	string k, g, m, h;
+	stack<string> base;
+	char hz=file.get();
+	while(file.good())
+	{
+		k+=hz;
+		hz=file.get();
+	}
+	file.close();
+	file.open(file_name.c_str(), ios::out);
+	for(int i=0; i<k.size(); i++)
+	{
+		if(i+6<k.size() && k[i]=='<' && k[i+1]=='/' && k[i+2]=='s' && k[i+3]=='p' && k[i+4]=='a' && k[i+5]=='n' && k[i+6]=='>')
+		{
+			i+=7;
+			if(i+4<k.size() && k[i]=='<' && k[i+1]=='s' && k[i+2]=='p' && k[i+3]=='a' && k[i+4]=='n')
+			{
+				i+=5;
+				m="<span";
+				while(i<k.size() && k[i]!='>')
+				{
+					m+=k[i];
+					i++;
+				}
+				m+='>';
+				if(g!=m){file << "</span>" << m;g=m;}
+			}
+			else
+			{
+				file << "</span>";
+				g="";
+				i--;
+			}
+		}
+		else if(i+4<k.size() && k[i]=='<' && k[i+1]=='s' && k[i+2]=='p' && k[i+3]=='a' && k[i+4]=='n')
+		{
+			i+=5;
+			m="<span";
+			while(i<k.size() && k[i]!='>')
+			{
+				m+=k[i];
+				i++;
+			}
+			m+='>';
+			if(g!=m){file << m;g=m;}
+		}
+		else file << k[i];
+	}
+	file.close();
+}
+
 int main(int argc, char **argv)
 {
 	ios_base::sync_with_stdio(false);
@@ -409,6 +464,7 @@ int main(int argc, char **argv)
 		output << code_coloring(input) << endl;
 		output << "</pre>\n</div>\n</body>\n</html>";
 		output.close();
+		compress(file_name+".html");
 	}
 return 0;
 }
