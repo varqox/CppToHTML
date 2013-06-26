@@ -24,11 +24,11 @@ comment
 
 int main() // oneline comment
 {
-    trol(0,1);
+    trol(0L, 111117162412LL);
     lli trol=0.0;
     std::cout << trol <<"\nlol";
     if(trol==0LL)
-    for(int i=0; i<1; ++i)
+    for(int i=0L; i<1; ++i)
         if(i==0) break;
     printf("\t%d\n%c", -1, '\n');
 return 0;

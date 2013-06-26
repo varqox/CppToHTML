@@ -80,6 +80,35 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 			ret+=str_or_char;
 			ret+="</span>";
 		}
+		else if(code[i]>='0' && code[i]<='9' && (i==0 || !code[i]=='_' || !(code[i]>='A' && code[i]<='Z') || !(code[i]>='a' && code[i]<='z')))
+		{
+			 bool point=false;
+			 ret+="<span class=\"p6\">";
+			 ret+=code[i];
+			 ++i;
+			 while(i<cl && ((code[i]>='0' && code[i]<='9') || code[i]=='.'))
+			 {
+			 	if(code[i]=='.')
+			 	{
+			 		if(point) break;
+			 		point=true;
+			 	}
+			 	ret+=code[i];
+			 	++i;
+			 }
+			 if(i<cl && code[i]=='L')
+			 {
+			 	ret+='L';
+			 	++i;
+			 	if(i<cl && code[i]=='L')
+			 	{
+			 		ret+='L';
+			 		++i;
+			 	}
+			 }
+			 ret+="</span>";
+			 --i;
+		}
 		else ret+=code[i];
 	}
 return ret;
