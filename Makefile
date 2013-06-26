@@ -1,7 +1,7 @@
 CXX=g++
 flags=-s -O3
 
-all: kmp spr gen aho
+all: kmp spr gen aho CppToHTML
 
 kmp: kmp.cpp
 	$(CXX) kmp.cpp $(flags) -o kmp
@@ -14,3 +14,6 @@ gen: gen.cpp
 
 aho: aho.cpp
 	$(CXX) aho.cpp $(flags) -o aho
+
+CppToHTML: main.cpp
+	$(CXX) main.cpp $(flags) -o CppToHTML

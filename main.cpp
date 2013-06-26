@@ -14,11 +14,20 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	string file_name=argv[1];
-	fstream file(file_name, ios_base::in | ios_base::out);
+	fstream file(file_name.c_str(), ios_base::in);
 	if(!file.good()) cout << "Connot open file!" << endl;
 	else
 	{
+		string input, lol;
+		getline(file, input);
+		while(!file.eof())
+		{
+			input+='\n';
+			getline(file, lol);
+			input+=lol;
+		}
 		file.close();
+		cout << input << endl;
 	}
 return 0;
 }
