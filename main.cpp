@@ -5,13 +5,136 @@
 
 using namespace std;
 
+namespace aho
+{
+	namespace tree
+	{
+		struct node
+		{
+			int E[256], fail, long_sh_pat, pattern_id; // fail pointer, max shorter patter, pattern id
+			bool is_pattern; // is pattern end in this vertex
+			char color; // highlight color
+			unsigned char character; // this node character
+			node(unsigned char letter=0): is_pattern(false), character(letter)
+			{
+				for(int i=0; i<256; ++i)
+					E[i]=0;
+			}
+			~node(){}
+		};
+
+		vector<node> graph;
+
+		void init()
+		{
+			graph.resize(1); // add root
+			graph[0].fail=graph[0].long_sh_pat=0; // max shorter pattern isn't exist
+		}
+
+		void add_word(const string& word, int id, char color)
+		{
+			int ver=0; // actual node (vertex)
+			for(int s=word.size(), i=0; i<s; ++i)
+			{
+				if(graph[ver].E[word[i]]!=0) ver=graph[ver].E[word[i]]; // actual view node = next node
+				else
+				{
+					ver=graph[ver].E[word[i]]=graph.size(); // add id of new node
+					graph.push_back(node(word[i])); // add new node
+				}
+			}
+			graph[ver].is_pattern=true;
+			graph[ver].pattern_id=id;
+			graph[ver].color=color;
+		}
+
+		void add_fails() // and the longest shorter patterns, based on BFS algorithm
+		{
+			queue<int> V;
+			// add root childrens
+			for(int i=0; i<256; ++i)
+			{
+				if(graph[0].E[i]!=0) // if children exists
+				{
+					graph[graph[0].E[i]].fail=graph[graph[0].E[i]].long_sh_pat=0;
+					V.push(graph[0].E[i]);
+				}
+			}
+			while(!V.empty())
+			{
+				int actual=V.front(); // id of actual view node
+				for(int i=0; i<256; ++i) // i is character of view node
+				{
+					if(graph[actual].E[i]!=0) // if children exists
+					{
+						actual=graph[actual].fail; // we have view node parent's fial edge
+						while(actual>0 && graph[actual].E[i]==0) // while we don't have node with children of actual character (i)
+							actual=graph[actual].fail;
+						actual=graph[graph[V.front()].E[i]].fail=graph[actual].E[i]; // the longest sufix, if 0 then longest sufix = root
+						// add the longest shorter pattern
+						if(graph[actual].is_pattern) // if the fail node is pattern then is long_sh_pat
+							graph[graph[V.front()].E[i]].long_sh_pat=actual;
+						else // long_sh_pat is the fail node's long_sh_pat
+							graph[graph[V.front()].E[i]].long_sh_pat=graph[actual].long_sh_pat;
+						actual=V.front();
+						V.push(graph[actual].E[i]); // add this children to queue
+					}
+				}
+				V.pop(); // remove visited node
+			}
+		}
+	}
+
+	vector<int> fin;
+
+	void find(const string& text)
+	{
+		vector<tree::node>().swap(tree::graph); // clear tree::graph
+		vector<int>(text.size()).swap(fin); // clear fin
+		tree::init(); // initialize tree
+		tree::add_fails(); // add fails edges
+		int act=0, pat; // actual node - root
+		for(int s=text.size(), i=0; i<s; ++i)
+		{
+			while(act>0 && tree::graph[act].E[text[i]]==0)
+				act=tree::graph[act].fail; // while we can't add text[i] to path, go to fail node
+			if(tree::graph[act].E[text[i]]!=0) // if we can add text[i] to path
+				act=tree::graph[act].E[text[i]];
+			if(tree::graph[act].is_pattern) // if actual node is pattern, then add it to fin
+			{
+				fin[i]=tree::graph[act].pattern_id;
+			}
+			else
+			{
+				pat=tree::graph[act].long_sh_pat; // go to the pattern node
+				while(pat>0) // finding the longest pattern
+				{
+					if(tree::graph[pat].is_pattern)
+					{
+						fin[i]=tree::graph[pat].pattern_id; // add pat node to fin
+						break;
+					}
+					pat=tree::graph[pat].long_sh_pat; // go to the next pattern
+				}
+			}
+		}
+	}
+}
+
+string synax_highlight(const string& code)
+{
+return code;
+}
+
 string code_coloring(const string& code) // coloring comments, preprocesor, chars and strings
 {
-	string ret;
+	string ret, rest;
 	for(int cl=code.size(), i=0; i<cl; ++i)
 	{
 		if(code[i]=='#') // preprocessor
 		{
+			ret+=synax_highlight(rest);
+			rest="";
 			ret+="<span class=\"p1\">";
 			while(i<cl && code[i]!='\n')
 			{
@@ -37,6 +160,8 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 		}
 		else if(i+1<cl && code[i]=='/' && code[i+1]=='/') // oneline comment
 		{
+			ret+=synax_highlight(rest);
+			rest="";
 			ret+="<span class=\"p8\">";
 			while(i<cl && code[i]!='\n')
 			{
@@ -48,6 +173,8 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 		}
 		else if(i+1<cl && code[i]=='/' && code[i+1]=='*') // multiline comment
 		{
+			ret+=synax_highlight(rest);
+			rest="";
 			ret+="<span class=\"p8\">/*";
 			i+=2;
 			while(i<cl && !(code[i-1]=='*' && code[i]=='/'))
@@ -61,6 +188,8 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 		}
 		else if(code[i]=='"' || code[i]=='\'') // strings and chars
 		{
+			ret+=synax_highlight(rest);
+			rest="";
 			char str_or_char=code[i];
 			ret+="<span class=\"p7\">";
 			ret+=str_or_char;
@@ -80,8 +209,10 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 			ret+=str_or_char;
 			ret+="</span>";
 		}
-		else if(code[i]>='0' && code[i]<='9' && (i==0 || !code[i]=='_' || !(code[i]>='A' && code[i]<='Z') || !(code[i]>='a' && code[i]<='z')))
+		else if(code[i]>='0' && code[i]<='9' && (i==0 || !code[i]=='_' || !(code[i]>='A' && code[i]<='Z') || !(code[i]>='a' && code[i]<='z'))) // numbers
 		{
+			ret+=synax_highlight(rest);
+			rest="";
 			 bool point=false;
 			 ret+="<span class=\"p6\">";
 			 ret+=code[i];
@@ -109,8 +240,9 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 			 ret+="</span>";
 			 --i;
 		}
-		else ret+=code[i];
+		else rest+=code[i];
 	}
+	ret+=synax_highlight(rest);
 return ret;
 }
 
