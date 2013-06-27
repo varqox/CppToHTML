@@ -149,8 +149,15 @@ string to_string(int a)
 return w;
 }
 
+struct pr
+{
+	string str;
+	char color;
+	pr(const string& a, char col): str(a), color(col)
+	{}
+};
 bool is_name[256]={}, is_true_name[256]={};
-vector<string> parse_types;
+vector<pr> parse_types;
 
 void make_tree()
 {
@@ -178,10 +185,10 @@ void make_tree()
 		aho::tree::add_word(key,0,4);
 	}
 	keys_file.close();
-	vector<string>::iterator i=parse_types.begin();
+	vector<pr>::iterator i=parse_types.begin();
 	while(i!=parse_types.end())
 	{
-		aho::tree::add_word(*i,0,2);
+		aho::tree::add_word(i->str,0,i->color);
 		++i;
 	}
 	aho::tree::add_fails(); // add fails edges
@@ -273,7 +280,8 @@ void parse(const string& code)
 			if(!type.empty())
 			{
 				cout << type << endl;
-				parse_types.push_back(type);
+				parse_types.push_back(pr(type,4));
+				parse_types.push_back(pr(type+"::",2));
 			}
 		}
 	}
