@@ -223,6 +223,11 @@ void parse(const string& code)
 						type+=code[i];
 						++i;
 					}
+					if(!type.empty())
+					{
+						parse_types.push_back(pr(type,4));
+						parse_types.push_back(pr(type+"::",2));
+					}
 					break;
 				case 1:
 					i+=6;
@@ -232,6 +237,11 @@ void parse(const string& code)
 					{
 						type+=code[i];
 						++i;
+					}
+					if(!type.empty())
+					{
+						parse_types.push_back(pr(type,4));
+						parse_types.push_back(pr(type+"::",2));
 					}
 					break;
 				case 2:
@@ -243,6 +253,8 @@ void parse(const string& code)
 						type+=code[i];
 						++i;
 					}
+					if(!type.empty())
+						parse_types.push_back(pr(type,4));
 					break;
 				case 3:
 					i+=9;
@@ -253,6 +265,8 @@ void parse(const string& code)
 						type+=code[i];
 						++i;
 					}
+					if(!type.empty())
+						parse_types.push_back(pr(type+"::",2));
 					break;
 				case 4:
 					i+=8;
@@ -262,6 +276,11 @@ void parse(const string& code)
 					{
 						type+=code[i];
 						++i;
+					}
+					if(!type.empty())
+					{
+						parse_types.push_back(pr(type,4));
+						parse_types.push_back(pr(type+"::",2));
 					}
 					break;
 				case 5:
@@ -275,14 +294,15 @@ void parse(const string& code)
 						type+=code[i];
 						++i;
 					}
+					if(!type.empty())
+					{
+						parse_types.push_back(pr(type,4));
+						parse_types.push_back(pr(type+"::",2));
+					}
 					break;
 			}
 			if(!type.empty())
-			{
-				cout << type << endl;
-				parse_types.push_back(pr(type,4));
-				parse_types.push_back(pr(type+"::",2));
-			}
+				cout << type << " " << type+"::" << endl;
 		}
 	}
 }
@@ -295,11 +315,11 @@ string synax_highlight(const string& code)
 	for(int cl=code.size(), i=0; i<cl; ++i)
 	{
 		//if pattern isn't included in any name (front)
-		if(aho::fin[i]!=0 && (aho::tree::graph[aho::fin[i]].color==5 || i==0 || !is_name[code[i-1]]))
+		if(aho::fin[i]!=0 && (aho::tree::graph[aho::fin[i]].color==5 || aho::tree::graph[aho::fin[i]].color==2 || i==0 || !is_name[code[i-1]]))
 		{
 			int end=i+aho::tree::graph[aho::fin[i]].depth;
 			//if pattern is included in any name (end)
-			if(aho::tree::graph[aho::fin[i]].color!=5 && (end>=cl || is_name[code[end]]))
+			if(aho::tree::graph[aho::fin[i]].color!=2 && aho::tree::graph[aho::fin[i]].color!=5 && (end>=cl || is_name[code[end]]))
 			{
 				switch(code[i])
 				{
@@ -317,10 +337,13 @@ string synax_highlight(const string& code)
 					--h;
 				while(h>0 && is_true_name[ret[h]])
 					--h;
-				if(old_color==4)
-					ret.insert(h+1, "<span class=\"p1\">");
-				else
-					ret.insert(h+1, "<span class=\"p4\">");
+				if(ret.size()-h>1)
+				{
+					if(old_color==4)
+						ret.insert(h+1, "<span class=\"p1\">");
+					else
+						ret.insert(h+1, "<span class=\"p4\">");
+				}
 				ret+="</span>";
 			}
 			else if(aho::tree::graph[aho::fin[i]].color!=5 || (code[i]!='*' && code[i]!='&'))
