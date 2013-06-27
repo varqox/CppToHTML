@@ -332,36 +332,41 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 			ret+=str_or_char;
 			ret+="</span>";
 		}
-		else if(code[i]>='0' && code[i]<='9' && (i==0 || !is_name[code[i-1]])) // numbers
-		{
-			ret+=synax_highlight(rest);
-			rest="";
-			 bool point=false;
-			 ret+="<span class=\"p6\">";
-			 ret+=code[i];
-			 ++i;
-			 while(i<cl && ((code[i]>='0' && code[i]<='9') || code[i]=='.'))
-			 {
-			 	if(code[i]=='.')
-			 	{
-			 		if(point) break;
-			 		point=true;
-			 	}
-			 	ret+=code[i];
-			 	++i;
-			 }
-			 if(i<cl && code[i]=='L')
-			 {
-			 	ret+='L';
-			 	++i;
-			 	if(i<cl && code[i]=='L')
-			 	{
-			 		ret+='L';
-			 		++i;
-			 	}
-			 }
-			 ret+="</span>";
-			 --i;
+		else if(code[i]>='0' && code[i]<='9' && (i==0 || (!is_name[code[i-1]] && !(code[i-1]>='0' && code[i-1]<='9')))) // numbers
+		{/*
+			if(code[i-1]>='0' && code[i-1]<='9')
+				rest+=code[i];
+			else*/
+			{
+				ret+=synax_highlight(rest);
+				rest="";
+				 bool point=false;
+				 ret+="<span class=\"p6\">";
+				 ret+=code[i];
+				 ++i;
+				 while(i<cl && ((code[i]>='0' && code[i]<='9') || code[i]=='.'))
+				 {
+				 	if(code[i]=='.')
+				 	{
+				 		if(point) break;
+				 		point=true;
+				 	}
+				 	ret+=code[i];
+				 	++i;
+				 }
+				 if(i<cl && code[i]=='L')
+				 {
+				 	ret+='L';
+				 	++i;
+				 	if(i<cl && code[i]=='L')
+				 	{
+				 		ret+='L';
+				 		++i;
+				 	}
+				 }
+				 ret+="</span>";
+				 --i;
+			}
 		}
 		else rest+=code[i];
 	}
