@@ -149,6 +149,8 @@ string to_string(int a)
 return w;
 }
 
+bool is_name[256]={};
+
 void make_tree()
 {
 	vector<aho::tree::node>().swap(aho::tree::graph); // clear tree::graph
@@ -185,11 +187,11 @@ string synax_highlight(const string& code)
 	for(int cl=code.size(), i=0; i<cl; ++i)
 	{
 		//if pattern isn't included in any name (front)
-		if(aho::fin[i]!=0 && (aho::tree::graph[aho::fin[i]].color==5 || i==0 || !(code[i-1]=='_' || (code[i-1]>='A' && code[i-1]<='Z') || (code[i-1]>='a' && code[i-1]<='z'))))
+		if(aho::fin[i]!=0 && (aho::tree::graph[aho::fin[i]].color==5 || i==0 || !is_name[code[i-1]]))
 		{
 			int end=i+aho::tree::graph[aho::fin[i]].depth;
 			//if pattern isn't included in any name (end)
-			if(aho::tree::graph[aho::fin[i]].color!=5 && (end>=cl || code[end]=='_' || (code[end]>='A' && code[end]<='Z') || (code[end]>='a' && code[end]<='z')))
+			if(aho::tree::graph[aho::fin[i]].color!=5 && (end>=cl || is_name[code[end]]))
 			{
 				switch(code[i])
 				{
@@ -330,7 +332,7 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 			ret+=str_or_char;
 			ret+="</span>";
 		}
-		else if(code[i]>='0' && code[i]<='9' && (i==0 || !(code[i-1]=='_' || (code[i-1]>='A' && code[i-1]<='Z') || (code[i-1]>='a' && code[i-1]<='z')))) // numbers
+		else if(code[i]>='0' && code[i]<='9' && (i==0 || !is_name[code[i-1]])) // numbers
 		{
 			ret+=synax_highlight(rest);
 			rest="";
@@ -430,6 +432,13 @@ int main(int argc, char **argv)
 		cout << "Usage: CppToHTML <file>" << endl;
 		return 0;
 	}
+	// make is name array
+	is_name['_']=true;
+	for(int i='A'; i<='Z'; ++i)
+		is_name[i]=true;
+	for(int i='a'; i<='z'; ++i)
+		is_name[i]=true;
+	// ------------------
 	string file_name=argv[1];
 	fstream file(file_name.c_str(), ios_base::in), output;
 	if(!file.good()) cout << "Connot open file!" << endl;
