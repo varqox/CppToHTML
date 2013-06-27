@@ -190,7 +190,7 @@ string synax_highlight(const string& code)
 		if(aho::fin[i]!=0 && (aho::tree::graph[aho::fin[i]].color==5 || i==0 || !is_name[code[i-1]]))
 		{
 			int end=i+aho::tree::graph[aho::fin[i]].depth;
-			//if pattern isn't included in any name (end)
+			//if pattern is included in any name (end)
 			if(aho::tree::graph[aho::fin[i]].color!=5 && (end>=cl || is_name[code[end]]))
 			{
 				switch(code[i])
@@ -201,6 +201,14 @@ string synax_highlight(const string& code)
 					default: ret+=code[i];break;
 				}
 				continue;
+			}
+			if(code[i]=='(')
+			{
+				int h=ret.size()-1;
+				while(h>0 && (is_name[ret[h]] || (ret[h]>='0' && ret[h]<='9')))
+					--h;
+				ret.insert(h+1, "<span class=\"p4\">");
+				ret+="</span>";
 			}
 			ret+="<span class=\"p"+to_string(aho::tree::graph[aho::fin[i]].color)+"\">";
 			for(; i<end; ++i)
