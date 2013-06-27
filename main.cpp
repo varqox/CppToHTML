@@ -149,7 +149,7 @@ string to_string(int a)
 return w;
 }
 
-string synax_highlight(const string& code)
+void make_tree()
 {
 	vector<aho::tree::node>().swap(aho::tree::graph); // clear tree::graph
 	aho::tree::init(); // initialize tree
@@ -176,6 +176,10 @@ string synax_highlight(const string& code)
 	}
 	keys_file.close();
 	aho::tree::add_fails(); // add fails edges
+}
+
+string synax_highlight(const string& code)
+{
 	aho::find(code);
 	string ret;
 	for(int cl=code.size(), i=0; i<cl; ++i)
@@ -226,6 +230,7 @@ return ret;
 
 string code_coloring(const string& code) // coloring comments, preprocesor, chars and strings
 {
+	make_tree();
 	string ret, rest;
 	for(int cl=code.size(), i=0; i<cl; ++i)
 	{
