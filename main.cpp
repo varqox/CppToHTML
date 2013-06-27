@@ -184,6 +184,7 @@ string synax_highlight(const string& code)
 {
 	aho::find(code);
 	string ret;
+	char old_color=0;
 	for(int cl=code.size(), i=0; i<cl; ++i)
 	{
 		//if pattern isn't included in any name (front)
@@ -205,11 +206,16 @@ string synax_highlight(const string& code)
 			if(code[i]=='(')
 			{
 				int h=ret.size()-1;
-				while(h>0 && (is_name[ret[h]] || (ret[h]>='0' && ret[h]<='9')))
+				while(h>0 && (is_name[ret[h]] || ret[h]==' ' || (ret[h]>='0' && ret[h]<='9')))
 					--h;
-				ret.insert(h+1, "<span class=\"p4\">");
+				if(old_color==4)
+					ret.insert(h+1, "<span class=\"p1\">");
+				else
+					ret.insert(h+1, "<span class=\"p4\">");
 				ret+="</span>";
 			}
+			else if(aho::tree::graph[aho::fin[i]].color!=5 || (code[i]!='*' && code[i]!='&'))
+				old_color=aho::tree::graph[aho::fin[i]].color;
 			ret+="<span class=\"p"+to_string(aho::tree::graph[aho::fin[i]].color)+"\">";
 			for(; i<end; ++i)
 			{
