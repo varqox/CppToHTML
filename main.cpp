@@ -149,7 +149,8 @@ string to_string(int a)
 return w;
 }
 
-bool is_name[256]={};
+bool is_name[256]={}, is_true_name[256]={};
+vector<string> parse_types;
 
 void make_tree()
 {
@@ -177,7 +178,105 @@ void make_tree()
 		aho::tree::add_word(key,0,4);
 	}
 	keys_file.close();
+	vector<string>::iterator i=parse_types.begin();
+	while(i!=parse_types.end())
+	{
+		aho::tree::add_word(*i,0,2);
+		++i;
+	}
 	aho::tree::add_fails(); // add fails edges
+}
+
+void parse(const string& code)
+{
+	vector<aho::tree::node>().swap(aho::tree::graph); // clear tree::graph
+	aho::tree::init(); // initialize tree
+	aho::tree::add_word("class",0,0);
+	aho::tree::add_word("struct",1,0);
+	aho::tree::add_word("enum",2,0);
+	aho::tree::add_word("namespace",3,0);
+	aho::tree::add_word("typename",4,0);
+	aho::tree::add_word("typedef",5,0);
+	aho::tree::add_fails(); // add fails edges
+	aho::find(code);
+	string type;
+	for(int cl=code.size(), i=0; i<cl; ++i)
+	{
+		if(aho::fin[i]!=0)
+		{
+			type="";
+			switch(aho::tree::graph[aho::fin[i]].pattern_id)
+			{
+				case 0:
+					i+=5;
+					while(i<cl && code[i]==' ')
+						++i;
+					while(i<cl && is_true_name[code[i]])
+					{
+						type+=code[i];
+						++i;
+					}
+					break;
+				case 1:
+					i+=6;
+					while(i<cl && code[i]==' ')
+						++i;
+					while(i<cl && is_true_name[code[i]])
+					{
+						type+=code[i];
+						++i;
+					}
+					break;
+				case 2:
+					i+=4;
+					while(i<cl && code[i]==' ')
+						++i;
+					while(i<cl && is_true_name[code[i]])
+					{
+						type+=code[i];
+						++i;
+					}
+					break;
+				case 3:
+					i+=9;
+					while(i<cl && code[i]==' ')
+						++i;
+					while(i<cl && is_true_name[code[i]])
+					{
+						type+=code[i];
+						++i;
+					}
+					break;
+				case 4:
+					i+=8;
+					while(i<cl && code[i]==' ')
+						++i;
+					while(i<cl && is_true_name[code[i]])
+					{
+						type+=code[i];
+						++i;
+					}
+					break;
+				case 5:
+					i+=7;
+					while(i<cl && code[i]!=';')
+						++i;
+					while(i>0 && is_true_name[code[i]])
+						--i;
+					while(i<cl && code[i]!=';')
+					{
+						type+=code[i];
+						++i;
+					}
+					break;
+			}
+			if(!type.empty())
+			{
+				cout << type << endl;
+				parse_types.push_back(type);
+			}
+		}
+	}
 }
 
 string synax_highlight(const string& code)
@@ -206,7 +305,9 @@ string synax_highlight(const string& code)
 			if(code[i]=='(')
 			{
 				int h=ret.size()-1;
-				while(h>0 && (is_name[ret[h]] || ret[h]==' ' || (ret[h]>='0' && ret[h]<='9')))
+				while(h>0 && ret[h]==' ')
+					--h;
+				while(h>0 && is_true_name[ret[h]])
 					--h;
 				if(old_color==4)
 					ret.insert(h+1, "<span class=\"p1\">");
@@ -246,6 +347,7 @@ return ret;
 
 string code_coloring(const string& code) // coloring comments, preprocesor, chars and strings
 {
+	parse(code);
 	make_tree();
 	string ret, rest;
 	for(int cl=code.size(), i=0; i<cl; ++i)
@@ -346,7 +448,7 @@ string code_coloring(const string& code) // coloring comments, preprocesor, char
 			ret+=str_or_char;
 			ret+="</span>";
 		}
-		else if(code[i]>='0' && code[i]<='9' && (i==0 || (!is_name[code[i-1]] && !(code[i-1]>='0' && code[i-1]<='9')))) // numbers
+		else if(code[i]>='0' && code[i]<='9' && (i==0 || !is_true_name[code[i-1]])) // numbers
 		{/*
 			if(code[i-1]>='0' && code[i-1]<='9')
 				rest+=code[i];
@@ -451,12 +553,14 @@ int main(int argc, char **argv)
 		cout << "Usage: CppToHTML <file>" << endl;
 		return 0;
 	}
-	// make is name array
-	is_name['_']=true;
+	// make is_name array
+	is_true_name['_']=is_name['_']=true;
 	for(int i='A'; i<='Z'; ++i)
-		is_name[i]=true;
+		is_true_name[i]=is_name[i]=true;
 	for(int i='a'; i<='z'; ++i)
-		is_name[i]=true;
+		is_true_name[i]=is_name[i]=true;
+	for(int i='0'; i<='9'; ++i)
+		is_true_name[i]=true;
 	// ------------------
 	string file_name=argv[1];
 	fstream file(file_name.c_str(), ios_base::in), output;
