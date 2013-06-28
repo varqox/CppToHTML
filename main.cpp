@@ -343,9 +343,14 @@ void parse(const string& code)
 					i+=7;
 					while(i<cl && code[i]!=';')
 						++i;
+					--i;
+					while(i>0 && code[i]==' ')
+						--i;
+					int ed=i;
 					while(i>0 && is_true_name[code[i]])
 						--i;
-					while(i<cl && code[i]!=';')
+					++i;
+					while(i<=ed && code[i]!=';')
 					{
 						type+=code[i];
 						++i;
