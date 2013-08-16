@@ -344,7 +344,7 @@ void parse(const string& code)
 					while(i<cl && code[i]!=';')
 						++i;
 					--i;
-					while(i>0 && code[i]==' ')
+					while(i>0 && (code[i]==' ' || code[i]=='\n'))
 						--i;
 					int ed=i;
 					while(i>0 && is_true_name[code[i]])
@@ -408,9 +408,9 @@ string synax_highlight(const string& code, int x)
 			if(code[i]=='(')
 			{
 				int h=ret.size()-1;
-				while(h>0 && ret[h]==' ')
+				while(h>=0 && ret[h]==' ')
 					--h;
-				while(h>0 && is_true_name[ret[h]])
+				while(h>=0 && is_true_name[ret[h]])
 					--h;
 				if(ret.size()-h>1)
 				{
@@ -676,7 +676,7 @@ int main(int argc, char **argv)
 		output.open((file_name+".html").c_str(), ios::out);
 		string input, lol;
 		int i=2;
-		output << "<html>\n<head>\n<meta charset=\"utf-8\">\n<style>\ndiv:after\n{\n	content: \".\";\n	display: inline-block;\n	clear: both;\n	visibility: hidden;\n	line-height: 0;\n	height: 0;\n}\n\ndiv\n{\n	display: inline-block;\n}\n\nbody\n{\n  background: #272822;\n  color: #f8f8f2;\n  font-family: Helvetica, Arial, sans-serif;\n  font-size: 14px;\n}\n.code\n{\n  width: 100%;\n  border: 2px solid #49483e;\n  border-radius: 4px;\n}\n\n.cpp_code\n{\n  text-align: left;\n	margin: 0;\n  margin-left: 0px;\n  overflow: auto;\n  padding-left: 1em;\n  padding-bottom: 5px;\n  padding-top: 5px;\n  padding-right: 5px;\n  border-left: 2px solid #49483e;\n}\n\n.num_lines\n{\n  color: #8f908a;\n  float: left;\n  margin: 0px;\n  text-align: right;\n  padding-left: 3px;\n  padding-right: 5px;\n  padding-bottom: 5px;\n  padding-top: 5px;\n}\n\n.p1{color: #a6e22e;}\n.p2{color: #ff9b4b;}\n.p3{color: #f92672;}\n.p4{color: #66d9ef;font-style: italic;}\n.p41{color: #66d9ef;}\n.p5{color: #B15555;}\n.p6{color: #ae81ff;}\n.p7{color: #e6db74;}\n.p8{color: gray;}\n</style>\n</head>\n<body>\n<div class=\"code\">\n<pre class=\"num_lines\">\n";
+		output << "<html>\n<head>\n<meta charset=\"utf-8\">\n<style>\ndiv:after\n{\n	content: \".\";\n	display: inline-block;\n	clear: both;\n	visibility: hidden;\n	line-height: 0;\n	height: 0;\n}\n\ndiv\n{\n	display: inline-block;\n}\n\nbody\n{\n  background: #272822;\n  color: #f8f8f2;\n  font-family: Helvetica, Arial, sans-serif;\n  font-size: 14px;\n}\n.code\n{\n  width: 100%;\n  border: 2px solid #49483e;\n  border-radius: 4px;\n}\n\n.cpp_code\n{\n  text-align: left;\n	margin: 0;\n  margin-left: 0px;\n  overflow: auto;\n  padding-left: 1em;\n  padding-bottom: 5px;\n  padding-top: 5px;\n  padding-right: 5px;\n  border-left: 2px solid #49483e;\n}\n\n.num_lines\n{\n  color: #8f908a;\n  float: left;\n  margin: 0px;\n  text-align: right;\n  padding-left: 3px;\n  padding-right: 5px;\n  padding-bottom: 5px;\n  padding-top: 5px;\n}\n\n.p1{color: #a6e22e;}\n.p2{color: #ff9b4b;}\n.p3{color: #f92672;}\n.p4{color: #66d9ef;font-style: italic;}\n.p41{color: #66d9ef;}\n.p5{color: #b15555;}\n.p6{color: #ae81ff;}\n.p7{color: #e6db74;}\n.p8{color: #75715e;}\n</style>\n</head>\n<body>\n<div class=\"code\">\n<pre class=\"num_lines\">\n";
 		if(!file.eof())
 		{
 			getline(file, lol);
