@@ -45,9 +45,7 @@ size_t
 time_t
 int8_t
 short
-false
 float
-true
 void
 char
 bool

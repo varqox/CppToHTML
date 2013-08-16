@@ -179,26 +179,28 @@ void make_tree()
 {
 	/*vector<aho::tree::node>().swap(aho::tree::graph); // clear tree::graph
 	aho::tree::init(); // initialize tree*/
+	aho::tree::add_word("true", 0, 6);
+	aho::tree::add_word("false", 0, 6);
 	fstream keys_file("patterns/red_keys.txt", ios::in);
 	string key;
 	while(keys_file.good())
 	{
 		getline(keys_file,key);
-		aho::tree::add_word(key,0,5);
+		aho::tree::add_word(key, 0, 5);
 	}
 	keys_file.close();
 	keys_file.open("patterns/keywords.txt", ios::in);
 	while(keys_file.good())
 	{
 		getline(keys_file,key);
-		aho::tree::add_word(key,0,3);
+		aho::tree::add_word(key, 0, 3);
 	}
 	keys_file.close();
 	keys_file.open("patterns/types.txt", ios::in);
 	while(keys_file.good())
 	{
 		getline(keys_file,key);
-		aho::tree::add_word(key,0,4);
+		aho::tree::add_word(key, 0, 4);
 	}
 	keys_file.close();
 	aho::tree::add_fails(); // add fails edges
