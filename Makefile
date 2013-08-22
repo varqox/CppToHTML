@@ -1,8 +1,8 @@
 CXX=g++
-CXXFLAGS=-s -O3
+CXXFLAGS=-Wall -s -O3
 RM= rm -f
 
-PHONY: all clean
+.PHONY: all clean
 all: cth
 
 cth: main.o aho.o parser.o synax_highlight.o
