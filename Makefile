@@ -1,19 +1,24 @@
 CXX=g++
-flags=-s -O3
+CXXFLAGS=-s -O3
+RM= rm -f
 
-all: kmp spr gen aho CppToHTML
+PHONY: all clean
+all: cth
 
-kmp: kmp.cpp
-	$(CXX) kmp.cpp $(flags) -o kmp
+cth: main.o aho.o parser.o synax_highlight.o
+	$(CXX) $^ -o $@
 
-spr: spr.cpp
-	$(CXX) spr.cpp $(flags) -o spr
+main.o: main.cpp main.hpp
+	$(CXX) -c $< -o $@
 
-gen: gen.cpp
-	$(CXX) gen.cpp $(flags) -o gen
+aho.o: aho.cpp main.hpp
+	$(CXX) -c $< -o $@
 
-aho: aho.cpp
-	$(CXX) aho.cpp $(flags) -o aho
+parser.o: parser.cpp main.hpp
+	$(CXX) -c $< -o $@
 
-CppToHTML: main.cpp
-	$(CXX) main.cpp $(flags) -o CppToHTML
+synax_highlight.o: synax_highlight.cpp main.hpp
+	$(CXX) -c $< -o $@
+
+clean:
+	$(RM) *.o
