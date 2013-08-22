@@ -10,11 +10,11 @@ int aho::aho_tree::add_word(const string& word, int id, char color)
 	int ver=0; // actual node (vertex)
 	for(int s=word.size(), i=0; i<s; ++i)
 	{
-		if(this->graph[ver].E[word[i]]!=0) ver=this->graph[ver].E[word[i]]; // actual view node = next node
+		if(this->graph[ver].E[static_cast<int>(word[i])]!=0) ver=this->graph[ver].E[static_cast<int>(word[i])]; // actual view node = next node
 		else
 		{
-			ver=this->graph[ver].E[word[i]]=this->graph.size(); // add id of new node
-			this->graph.push_back(node(word[i])); // add new node
+			ver=this->graph[ver].E[static_cast<int>(word[i])]=this->graph.size(); // add id of new node
+			this->graph.push_back(node(static_cast<int>(word[i]))); // add new node
 		}
 	}
 	this->graph[ver].is_pattern=true;
@@ -72,10 +72,10 @@ void aho::find(const string& text, int x)
 			this->troll.pop();
 		}
 		//--------------------------------------
-		while(act>0 && tree.graph[act].E[text[i]]==0)
+		while(act>0 && tree.graph[act].E[static_cast<int>(text[i])]==0)
 			act=tree.graph[act].fail; // while we can't add text[i] to path, go to fail node
-		if(tree.graph[act].E[text[i]]!=0) // if we can add text[i] to path
-			act=tree.graph[act].E[text[i]];
+		if(tree.graph[act].E[static_cast<int>(text[i])]!=0) // if we can add text[i] to path
+			act=tree.graph[act].E[static_cast<int>(text[i])];
 		if(tree.graph[act].is_pattern) // if actual node is pattern, then add it to fin
 		{
 			this->fin[i-tree.graph[act].depth+1]=act;

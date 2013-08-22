@@ -46,7 +46,7 @@ void compress(string file_name)
 	}
 	file.close();
 	file.open(file_name.c_str(), ios::out);
-	for(int i=0; i<k.size(); i++)
+	for(unsigned int i=0; i<k.size(); i++)
 	{
 		if(i+6<k.size() && k[i]=='<' && k[i+1]=='/' && k[i+2]=='s' && k[i+3]=='p' && k[i+4]=='a' && k[i+5]=='n' && k[i+6]=='>')
 		{

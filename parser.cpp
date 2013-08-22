@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-namespace parser
+namespace parser // anslysing code
 {
 	aho _aho;
 	queue<change> changs;
@@ -8,7 +8,7 @@ namespace parser
 	/*vector<string> includes_directories;
 	void parse_file();*/
 
-	void parse(const string& code)
+	void parse(const string& code) // finds types and analysis preprocessor
 	{
 		// vector<_aho.tree::node>().swap(_aho.tree::graph); // clear tree::graph
 		// _aho.tree::init(); // initialize tree
@@ -38,7 +38,7 @@ namespace parser
 						i+=5;
 						while(i<cl && code[i]==' ')
 							++i;
-						while(i<cl && is_true_name[code[i]])
+						while(i<cl && is_true_name[static_cast<int>(code[i])])
 						{
 							type+=code[i];
 							++i;
@@ -56,7 +56,7 @@ namespace parser
 						i+=6;
 						while(i<cl && code[i]==' ')
 							++i;
-						while(i<cl && is_true_name[code[i]])
+						while(i<cl && is_true_name[static_cast<int>(code[i])])
 						{
 							type+=code[i];
 							++i;
@@ -74,7 +74,7 @@ namespace parser
 						i+=5;
 						while(i<cl && code[i]==' ')
 							++i;
-						while(i<cl && is_true_name[code[i]])
+						while(i<cl && is_true_name[static_cast<int>(code[i])])
 						{
 							type+=code[i];
 							++i;
@@ -92,7 +92,7 @@ namespace parser
 						i+=4;
 						while(i<cl && code[i]==' ')
 							++i;
-						while(i<cl && is_true_name[code[i]])
+						while(i<cl && is_true_name[static_cast<int>(code[i])])
 						{
 							type+=code[i];
 							++i;
@@ -109,7 +109,7 @@ namespace parser
 						i+=9;
 						while(i<cl && code[i]==' ')
 							++i;
-						while(i<cl && is_true_name[code[i]])
+						while(i<cl && is_true_name[static_cast<int>(code[i])])
 						{
 							type+=code[i];
 							++i;
@@ -129,7 +129,7 @@ namespace parser
 						i+=8;
 						while(i<cl && code[i]==' ')
 							++i;
-						while(i<cl && is_true_name[code[i]])
+						while(i<cl && is_true_name[static_cast<int>(code[i])])
 						{
 							type+=code[i];
 							++i;
@@ -151,7 +151,7 @@ namespace parser
 						while(i>0 && (code[i]==' ' || code[i]=='\n'))
 							--i;
 						int ed=i;
-						while(i>0 && is_true_name[code[i]])
+						while(i>0 && is_true_name[static_cast<int>(code[i])])
 							--i;
 						++i;
 						while(i<=ed && code[i]!=';')

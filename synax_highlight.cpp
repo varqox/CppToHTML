@@ -43,7 +43,7 @@ namespace synax_highlight
 		}
 	}
 
-	string synax_highlight(const string& code, int x)
+	string synax_highlight(const string& code, int x) // coloring code without comments, preprocessor, chars and strings
 	{
 		_aho.find(code, x);
 		string ret;
@@ -53,18 +53,18 @@ namespace synax_highlight
 			make_changes(x+i-code.size());
 			//cout << i << ": " << _aho.tree.graph[3].color+0 << endl;
 			//if pattern isn't included in any name (front)
-			if(_aho.fin[i]!=0 && (_aho.tree.graph[_aho.fin[i]].color==5 || _aho.tree.graph[_aho.fin[i]].color==2 || i==0 || !is_name[code[i-1]]))
+			if(_aho.fin[i]!=0 && (_aho.tree.graph[_aho.fin[i]].color==5 || _aho.tree.graph[_aho.fin[i]].color==2 || i==0 || !is_name[static_cast<int>(code[i-1])]))
 			{
 				int end=i+_aho.tree.graph[_aho.fin[i]].depth;
 				//if pattern is included in any name (end)
-				if(_aho.tree.graph[_aho.fin[i]].color!=2 && _aho.tree.graph[_aho.fin[i]].color!=5 && (end>=cl || is_name[code[end]]))
+				if(_aho.tree.graph[_aho.fin[i]].color!=2 && _aho.tree.graph[_aho.fin[i]].color!=5 && (end>=cl || is_name[static_cast<int>(code[end])]))
 				{
 					switch(code[i])
 					{
 						case '<': ret+="&lt;";break;
 						case '>': ret+="&gt;";break;
 						case '&': ret+="&amp;";break;
-						default: ret+=code[i];break;
+						default: ret+=code[i];
 					}
 					continue;
 				}
@@ -73,7 +73,7 @@ namespace synax_highlight
 					int h=ret.size()-1;
 					while(h>=0 && ret[h]==' ')
 						--h;
-					while(h>=0 && is_true_name[ret[h]])
+					while(h>=0 && is_true_name[static_cast<int>(ret[h])])
 						--h;
 					if(ret.size()-h>1)
 					{
@@ -95,7 +95,7 @@ namespace synax_highlight
 						case '<': ret+="&lt;";break;
 						case '>': ret+="&gt;";break;
 						case '&': ret+="&amp;";break;
-						default: ret+=code[i];break;
+						default: ret+=code[i];
 					}
 				}
 				ret+="</span>";
@@ -108,14 +108,14 @@ namespace synax_highlight
 					case '<': ret+="&lt;";break;
 					case '>': ret+="&gt;";break;
 					case '&': ret+="&amp;";break;
-					default: ret+=code[i];break;
+					default: ret+=code[i];
 				}
 			}
 		}
 	return ret;
 	}
 
-	string code_coloring(const string& code) // coloring comments, preprocesor, chars and strings
+	string code_coloring(const string& code) // coloring comments, preprocessor, chars and strings
 	{
 		parser::parse(code);
 		string ret, rest;
@@ -125,7 +125,25 @@ namespace synax_highlight
 			{
 				ret+=synax_highlight(rest, i);
 				rest="";
-				ret+="<span class=\"p1\">";
+				ret+="<span class=\"p1\">#";
+				bool in_quotation=false, is_include=false;
+				while(++i<cl && code[i]!='\n' && (code[i]==' ' || code[i]=='\\'))
+				{
+					if(i+1<cl && code[i]=='\\' && code[i+1]=='\n')
+					{
+						ret+="\\\n";
+						++i;
+					}
+					else
+						switch(code[i])
+						{
+							case '<': ret+="&lt;";break;
+							case '>': ret+="&gt;";break;
+							case '&': ret+="&amp;";break;
+							default: ret+=code[i];
+						}
+				}
+				if(code[i]!='\n' && i+6<cl && code[i]=='i' && code[i+1]=='n' && code[i+2]=='c' && code[i+3]=='l' && code[i+4]=='u' && code[i+5]=='d' && code[i+6]=='e') is_include=true;
 				while(i<cl && code[i]!='\n')
 				{
 					if(i+1<cl && code[i]=='\\' && code[i+1]=='\n')
@@ -135,13 +153,23 @@ namespace synax_highlight
 					}
 					else
 					{
-						switch(code[i])
-						{
-							case '<': ret+="&lt;";break;
-							case '>': ret+="&gt;";break;
-							case '&': ret+="&amp;";break;
-							default: ret+=code[i];break;
-						}
+						if(is_include)
+							switch(code[i])
+							{
+								case '<': ret+="<span class=\"p7\">&lt;";break;
+								case '>': ret+="&gt;</span>";break;
+								case '"': ret+=(in_quotation^=true) ? "<span class=\"p7\">\"":"\"</span>";break;
+								case '&': ret+="&amp;";break;
+								default: ret+=code[i];
+							}
+						else
+							switch(code[i])
+							{
+								case '<': ret+="&lt;";break;
+								case '>': ret+="&gt;";break;
+								case '&': ret+="&amp;";break;
+								default: ret+=code[i];
+							}
 					}
 					++i;
 				}
@@ -155,7 +183,13 @@ namespace synax_highlight
 				ret+="<span class=\"p8\">";
 				while(i<cl && code[i]!='\n')
 				{
-					ret+=code[i];
+					switch(code[i])
+					{
+						case '<': ret+="&lt;";break;
+						case '>': ret+="&gt;";break;
+						case '&': ret+="&amp;";break;
+						default: ret+=code[i];
+					}
 					++i;
 				}
 				ret+="</span>";
@@ -169,7 +203,13 @@ namespace synax_highlight
 				i+=2;
 				while(i<cl && !(code[i-1]=='*' && code[i]=='/'))
 				{
-					ret+=code[i];
+					switch(code[i])
+					{
+						case '<': ret+="&lt;";break;
+						case '>': ret+="&gt;";break;
+						case '&': ret+="&amp;";break;
+						default: ret+=code[i];
+					}
 					++i;
 				}
 				if(i<cl) // if comment ending
@@ -197,7 +237,7 @@ namespace synax_highlight
 								case '<': ret+="&lt;";break;
 								case '>': ret+="&gt;";break;
 								case '&': ret+="&amp;";break;
-								default: ret+=code[i];break;
+								default: ret+=code[i];
 							}
 						}
 						ret+="</span>";
@@ -209,7 +249,7 @@ namespace synax_highlight
 							case '<': ret+="&lt;";break;
 							case '>': ret+="&gt;";break;
 							case '&': ret+="&amp;";break;
-							default: ret+=code[i];break;
+							default: ret+=code[i];
 						}
 					}
 					++i;
@@ -217,7 +257,7 @@ namespace synax_highlight
 				ret+=str_or_char;
 				ret+="</span>";
 			}
-			else if(code[i]>='0' && code[i]<='9' && (i==0 || !is_true_name[code[i-1]])) // numbers
+			else if(code[i]>='0' && code[i]<='9' && (i==0 || !is_true_name[static_cast<int>(code[i-1])])) // numbers
 			{/*
 				if(code[i-1]>='0' && code[i-1]<='9')
 					rest+=code[i];

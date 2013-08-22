@@ -52,7 +52,7 @@ public:
 
 	struct ch_pat
 	{
-		int pos, id;
+		unsigned int pos, id;
 		bool is_pattern;
 		ch_pat(int p1, int p2, bool p3): pos(p1), id(p2), is_pattern(p3)
 		{}
@@ -65,7 +65,7 @@ public:
 };
 
 // parser.cpp
-namespace parser
+namespace parser // anslysing code
 {
 	struct change 
 	{
@@ -76,7 +76,7 @@ namespace parser
 	};
 	extern aho _aho;
 	extern queue<change> changs;
-	void parse(const string& code);
+	void parse(const string& code); // finds types and analysis 
 }
 
 // synax_highlight
