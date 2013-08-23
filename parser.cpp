@@ -45,9 +45,9 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,4);
+							id=synax_highlight::_aho.tree.add_word(type,0,9);
 							changs.push(change(ps,id,2));
-							changs.push(change(i,id,4));
+							changs.push(change(i,id,9));
 							synax_highlight::_aho.tree.add_word(type+"::",0,2);
 						}
 						break;
@@ -63,9 +63,9 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,4);
+							id=synax_highlight::_aho.tree.add_word(type,0,9);
 							changs.push(change(ps,id,2));
-							changs.push(change(i,id,4));
+							changs.push(change(i,id,9));
 							synax_highlight::_aho.tree.add_word(type+"::",0,2);
 						}
 						break;
@@ -81,9 +81,9 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,4);
+							id=synax_highlight::_aho.tree.add_word(type,0,9);
 							changs.push(change(ps,id,2));
-							changs.push(change(i,id,4));
+							changs.push(change(i,id,9));
 							synax_highlight::_aho.tree.add_word(type+"::",0,2);
 						}
 						break;
@@ -99,9 +99,9 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,4);
+							id=synax_highlight::_aho.tree.add_word(type,0,9);
 							changs.push(change(ps,id,2));
-							changs.push(change(i,id,4));
+							changs.push(change(i,id,9));
 						}
 						break;
 					case 4:
@@ -116,7 +116,7 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,4);
+							id=synax_highlight::_aho.tree.add_word(type,0,9);
 							_aho.troll.push(aho::ch_pat(i-1,id,true));
 							_aho.troll.push(aho::ch_pat(i,id,false));
 							changs.push(change(ps,id,2));
@@ -136,9 +136,9 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,4);
+							id=synax_highlight::_aho.tree.add_word(type,0,9);
 							changs.push(change(ps,id,2));
-							changs.push(change(i,id,4));
+							changs.push(change(i,id,9));
 							synax_highlight::_aho.tree.add_word(type+"::",0,2);
 						}
 						break;
@@ -161,9 +161,9 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,4);
+							id=synax_highlight::_aho.tree.add_word(type,0,9);
 							changs.push(change(ps,id,2));
-							changs.push(change(i,id,4));
+							changs.push(change(i,id,9));
 							id=synax_highlight::_aho.tree.add_word(type+"::",0,2);
 						}
 						break;

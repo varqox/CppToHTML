@@ -81,8 +81,8 @@ namespace synax_highlight
 							ret.insert(h+1, "<span class=\"p1\">");
 						else
 							ret.insert(h+1, "<span class=\"p41\">");
+						ret+="</span>";
 					}
-					ret+="</span>";
 				}
 				else if(_aho.tree.graph[_aho.fin[i]].color!=5 || (code[i]!='*' && code[i]!='&'))
 					old_color=_aho.tree.graph[_aho.fin[i]].color;
