@@ -15,7 +15,7 @@ p9 - blue
 
 string to_string(int a)
 {
-	stack<char> st;
+	stack<unsigned char> st;
 	while(a>0)
 	{
 		st.push('0'+a%10);
@@ -36,17 +36,17 @@ bool is_name[256]={}, is_true_name[256]={};
 void compress(string file_name)
 {
 	fstream file;
-	file.open(file_name.c_str(), ios::in);
+	file.open(file_name.c_str(), ios_base::in);
 	string k, g, m, h;
 	stack<string> base;
-	char hz=file.get();
+	unsigned char hz=file.get();
 	while(file.good())
 	{
 		k+=hz;
 		hz=file.get();
 	}
 	file.close();
-	file.open(file_name.c_str(), ios::out);
+	file.open(file_name.c_str(), ios_base::out);
 	for(unsigned int i=0; i<k.size(); i++)
 	{
 		if(i+6<k.size() && k[i]=='<' && k[i+1]=='/' && k[i+2]=='s' && k[i+3]=='p' && k[i+4]=='a' && k[i+5]=='n' && k[i+6]=='>')
@@ -88,7 +88,7 @@ void compress(string file_name)
 	file.close();
 }
 
-int main(int argc, char **argv)
+int main(int argc, unsigned char **argv)
 {
 	ios_base::sync_with_stdio(false);
 	if(argc<2)
@@ -104,15 +104,31 @@ int main(int argc, char **argv)
 		is_true_name[i]=is_name[i]=true;
 	for(int i='0'; i<='9'; ++i)
 		is_true_name[i]=true;
-	// get search includes directories
-
+	// get search includes directories - only for linux!
+	string __file=argv[1];
+	if(__file[0]!='/')
+	{
+		if(system("pwd > lol.shell"));
+		fstream lol("lol.shell", ios_base::in);
+		string path;
+		if(lol.good())
+		{
+			getline(lol, path);
+			lol.close();
+		}
+		if(system("rm -f lol.shell"));
+		if(*--path.end()!='/') path+='/';
+		__file=path+__file;
+	}
+	parser::init();
+	parser::parse_file(__file);
 	// ------------------
 	string file_name=argv[1];
 	fstream file(file_name.c_str(), ios_base::in), output;
 	if(!file.good()) cout << "Connot open file!" << endl;
 	else
 	{
-		output.open((file_name+".html").c_str(), ios::out);
+		output.open((file_name+".html").c_str(), ios_base::out);
 		string input, lol;
 		int i=2;
 		output << "<html>\n<head>\n<meta charset=\"utf-8\">\n<style>\ndiv:after\n{\n	content: \".\";\n	display: inline-block;\n	clear: both;\n	visibility: hidden;\n	line-height: 0;\n	height: 0;\n}\n\ndiv\n{\n	display: inline-block;\n}\n\nbody\n{\n  background: #272822;\n  color: #f8f8f2;\n  font-family: Helvetica, Arial, sans-serif;\n  font-size: 14px;\n}\n.code\n{\n  width: 100%;\n  border: 2px solid #49483e;\n  border-radius: 4px;\n}\n\n.cpp_code\n{\n  text-align: left;\n	margin: 0;\n  margin-left: 0px;\n  overflow: auto;\n  padding-left: 1em;\n  padding-bottom: 5px;\n  padding-top: 5px;\n  padding-right: 5px;\n  border-left: 2px solid #49483e;\n}\n\n.num_lines\n{\n  color: #8f908a;\n  float: left;\n  margin: 0px;\n  text-align: right;\n  padding-left: 3px;\n  padding-right: 5px;\n  padding-bottom: 5px;\n  padding-top: 5px;\n}\n\n.p1{color: #a6e22e;}\n.p2{color: #ff9b4b;}\n.p3{color: #f92672;}\n.p4{color: #66d9ef;font-style: italic;}\n.p41{color: #66d9ef;}\n.p5{color: #b15555;}\n.p6{color: #ae81ff;}\n.p7{color: #e6db74;}\n.p8{color: #75715e;}\n.p9{color: #3c74ec;}\n</style>\n</head>\n<body>\n<div class=\"code\">\n<pre class=\"num_lines\">\n";
@@ -134,7 +150,7 @@ int main(int argc, char **argv)
 			// input+=lol (tab_size=4)
 			for(int ll=lol.size(), q=0; q<ll; ++q)
 			{
-				if(lol[q]=='\t') input+="    ";
+				if(lol[q]=='\t') input+="    "; // tab size: 4
 				else input+=lol[q];
 			}
 			output << i << '\n';

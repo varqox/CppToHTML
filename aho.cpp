@@ -5,7 +5,7 @@ aho::aho_tree::aho_tree(): graph(1) // add root
 	this->graph[0].fail=this->graph[0].long_sh_pat=0; // max shorter pattern isn't exist
 }
 
-int aho::aho_tree::add_word(const string& word, int id, char color)
+int aho::aho_tree::add_word(const string& word, int id, unsigned char color)
 {
 	int ver=0; // actual node (vertex)
 	for(int s=word.size(), i=0; i<s; ++i)

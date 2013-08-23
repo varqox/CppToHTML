@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 #include <vector>
 #include <queue>
 #include <stack>
@@ -30,9 +31,9 @@ public:
 		{
 			int E[256], fail, long_sh_pat, pattern_id, depth; // fail pointer, max shorter patter, pattern id
 			bool is_pattern; // is pattern end in this vertex
-			char color; // highlight color
-			unsigned char character; // this node character
-			node(unsigned char letter=0): is_pattern(false), character(letter)
+			unsigned char color; // highlight color
+			unsigned unsigned char character; // this node character
+			node(unsigned unsigned char letter=0): is_pattern(false), character(letter)
 			{
 				for(int i=0; i<256; ++i)
 					E[i]=0;
@@ -44,7 +45,7 @@ public:
 
 		aho_tree();
 		~aho_tree(){}
-		int add_word(const string& word, int id, char color);
+		int add_word(const string& word, int id, unsigned char color);
 		void add_fails(); // and the longest shorter patterns, based on BFS algorithm
 	};
 
@@ -71,13 +72,36 @@ namespace parser // anslysing code
 	struct change 
 	{
 		int pos, id; // pos - position, node id
-		char color;
-		change(int ps, int idx, char p2): pos(ps), id(idx), color(p2)
+		unsigned char color;
+		change(int ps, int idx, unsigned char p2): pos(ps), id(idx), color(p2)
 		{}
 	};
+
+	namespace var_base
+	{
+		struct ver
+		{
+			int t[256];
+			bool is;
+			ver();
+			~ver(){};
+		};
+		extern vector<ver> _v;
+		extern queue<int> _free;
+		extern bool is_there;
+		void add_var(const string&);
+		bool remove_var(string);
+		bool is_var(const string&);
+	}
+
 	extern aho _aho;
 	extern queue<change> changs;
-	void parse(const string& code); // finds types and analysis 
+
+	void init();
+	string absolute_path(const string& path);
+	bool file_exist(const string& file_name);
+	void parse_file(string file_name);
+	void parse(const string& code, bool add_changs=true); // finds types and analysis 
 }
 
 // synax_highlight
