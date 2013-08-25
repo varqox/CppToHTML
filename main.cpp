@@ -47,11 +47,14 @@ void compress(string file_name)
 	}
 	file.close();
 	file.open(file_name.c_str(), ios_base::out);
-	for(unsigned int i=0; i<k.size(); i++)
+	for(unsigned int i=0; i<k.size(); ++i)
 	{
 		if(i+6<k.size() && k[i]=='<' && k[i+1]=='/' && k[i+2]=='s' && k[i+3]=='p' && k[i+4]=='a' && k[i+5]=='n' && k[i+6]=='>')
 		{
-			i+=7;
+			i+=6;
+			string buff;
+			while(k[++i]==' ' || k[i]=='\n' || k[i]=='\t')
+				buff+=k[i];
 			if(i+4<k.size() && k[i]=='<' && k[i+1]=='s' && k[i+2]=='p' && k[i+3]=='a' && k[i+4]=='n')
 			{
 				i+=5;
@@ -59,14 +62,15 @@ void compress(string file_name)
 				while(i<k.size() && k[i]!='>')
 				{
 					m+=k[i];
-					i++;
+					++i;
 				}
 				m+='>';
-				if(g!=m){file << "</span>" << m;g=m;}
+				if(g!=m){file << "</span>" << buff << m;g=m;}
+				else file << buff;
 			}
 			else
 			{
-				file << "</span>";
+				file << "</span>" << buff;
 				g="";
 				i--;
 			}
@@ -78,7 +82,7 @@ void compress(string file_name)
 			while(i<k.size() && k[i]!='>')
 			{
 				m+=k[i];
-				i++;
+				++i;
 			}
 			m+='>';
 			if(g!=m){file << m;g=m;}

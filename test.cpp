@@ -455,7 +455,7 @@ namespace unlimited_int
 			d1=t1/FFT_base;
 			if(t1%FFT_base!=0) ++d1;
 			t2=b.size();
-			d2=t2/FFT_base; 
+			d2=t2/FFT_base;
 			if(t2%FFT_base!=0) ++d2;
 			d=__builtin_popcount(d1+d2)==1 ? d1+d2:1<<(32-__builtin_clz(d1+d2));
 
