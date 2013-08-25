@@ -32,8 +32,8 @@ public:
 			int E[256], fail, long_sh_pat, pattern_id, depth; // fail pointer, max shorter patter, pattern id
 			bool is_pattern; // is pattern end in this vertex
 			unsigned char color; // highlight color
-			unsigned unsigned char character; // this node character
-			node(unsigned unsigned char letter=0): is_pattern(false), character(letter)
+			unsigned char character; // this node character
+			node(unsigned char letter=0): is_pattern(false), character(letter)
 			{
 				for(int i=0; i<256; ++i)
 					E[i]=0;
@@ -96,6 +96,7 @@ namespace parser // anslysing code
 
 	extern aho _aho;
 	extern queue<change> changs;
+	extern vector<string> include_directories;
 
 	void init();
 	string absolute_path(const string& path);

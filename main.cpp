@@ -88,7 +88,7 @@ void compress(string file_name)
 	file.close();
 }
 
-int main(int argc, unsigned char **argv)
+int main(int argc, char **argv)
 {
 	ios_base::sync_with_stdio(false);
 	if(argc<2)
@@ -104,7 +104,20 @@ int main(int argc, unsigned char **argv)
 		is_true_name[i]=is_name[i]=true;
 	for(int i='0'; i<='9'; ++i)
 		is_true_name[i]=true;
-	// get search includes directories - only for linux!
+	// get search includes directories and actual path - only for linux!
+	// includes
+	fstream settings("settings.cfg", ios_base::in);
+	if(settings.good())
+	{
+		string path;
+		while(!settings.eof())
+		{
+			getline(settings, path);
+			parser::include_directories.push_back(path);
+		}
+	}
+	else cerr << "Cannot load settings.cfg file with include directories!\n";
+	// path
 	string __file=argv[1];
 	if(__file[0]!='/')
 	{

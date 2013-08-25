@@ -85,7 +85,7 @@ namespace parser // anslysing code
 		}
 	}
 
-	// vector<string> includes_directories;
+	vector<string> include_directories;
 
 	void init()
 	{
@@ -144,7 +144,9 @@ namespace parser // anslysing code
 				continue;
 			}
 			var_base::add_var(file_name);
+		#ifdef DEBUG
 			cout << endl << file_name << endl;
+		#endif
 			string code, directory, to_parse;
 			{
 				int k=file_name.size()-1;
@@ -195,8 +197,8 @@ namespace parser // anslysing code
 						{
 							while(code[++i]!='>')
 								incl+=code[i];
-							files.push("/usr/include/"+incl);
-							files.push("/usr/include/c++/4.7/"+incl);
+							for(vector<string>::iterator i=include_directories.begin(); i!=include_directories.end(); ++i)
+								files.push(*i+(*--(i->end())=='/' ? "":"/")+incl);
 						}
 					}
 					while(i<cl && code[i]!='\n')
@@ -407,8 +409,10 @@ namespace parser // anslysing code
 						}
 						break;
 				}
+			#ifdef DEBUG
 				if(!type.empty())
 					cout << type << " " << type+"::" << endl;
+			#endif
 			}
 		}
 	}
