@@ -354,7 +354,7 @@ namespace parser // anslysing code
 								changs.push(change(ps,id,2));
 								changs.push(change(i,id,4));
 							}
-							id=synax_highlight::_aho.tree.add_word(type+"::",0,2);
+							synax_highlight::_aho.tree.add_word(type+"::",0,2);
 						}
 						break;
 					case 5:
@@ -405,13 +405,13 @@ namespace parser // anslysing code
 								changs.push(change(ps,id,2));
 								changs.push(change(i,id,9));
 							}
-							id=synax_highlight::_aho.tree.add_word(type+"::",0,2);
+							synax_highlight::_aho.tree.add_word(type+"::",0,2);
 						}
 						break;
 				}
 			#ifdef DEBUG
 				if(!type.empty())
-					cout << type << " " << type+"::" << endl;
+					cout << type << endl;
 			#endif
 			}
 		}

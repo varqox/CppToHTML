@@ -117,6 +117,12 @@ namespace synax_highlight
 }
 
 // main.cpp
+enum Color_schemes
+{
+	sublime,
+	codeblocks
+};
+extern Color_schemes color_scheme;
 extern bool is_name[256], is_true_name[256];
 string to_string(int);
 void compress(string file_name);

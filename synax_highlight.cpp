@@ -5,8 +5,17 @@ namespace synax_highlight
 	aho _aho;
 	void make_tree()
 	{
-		_aho.tree.add_word("true", 0, 6);
-		_aho.tree.add_word("false", 0, 6);
+		switch(color_scheme)
+		{
+			case sublime:
+				_aho.tree.add_word("true", 0, 6);
+				_aho.tree.add_word("false", 0, 6);
+				break;
+			case codeblocks:
+				_aho.tree.add_word("true", 0, 4);
+				_aho.tree.add_word("false", 0, 4);
+				break;
+		}
 		fstream keys_file("patterns/red_keys.txt", ios::in);
 		string key;
 		while(keys_file.good())
@@ -75,7 +84,7 @@ namespace synax_highlight
 					if(ret.size()-h>1)
 					{
 						if(old_color==4)
-							ret.insert(h+1, "<span class=\"p1\">");
+							ret.insert(h+1, "<span class=\"p42\">");
 						else
 							ret.insert(h+1, "<span class=\"p41\">");
 						ret+="</span>";
@@ -219,7 +228,7 @@ namespace synax_highlight
 				ret+=synax_highlight(rest, i);
 				rest="";
 				unsigned char str_or_char=code[i];
-				ret+="<span class=\"p7\">";
+				ret+="<span class=\"p"+string(str_or_char=='\'' ? "71":"7")+"\">";
 				ret+=str_or_char;
 				++i;
 				while(i<cl && code[i]!=str_or_char)
