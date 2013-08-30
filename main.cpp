@@ -33,6 +33,17 @@ string to_string(int a)
 return w;
 }
 
+// Only for linux
+string extract_file_name(const string& str)
+{
+	string out;
+	int sl=str.size(), i=sl;
+	while(--i, str[i]!='/');
+	while(++i, i<sl)
+		out+=str[i];
+return out;
+}
+
 bool is_name[256]={}, is_true_name[256]={};
 
 void compress(string file_name)
@@ -162,16 +173,16 @@ int main(int argc, char **argv)
 	parser::parse_file(file_name);
 	// ------------------
 	fstream file(file_name.c_str(), ios_base::in), output;
-	if(!file.good()) cout << "Connot open file!" << endl;
+	if(!file.good()) cerr << "Connot open file!" << endl;
 	else
 	{
 		output.open((file_name+".html").c_str(), ios_base::out);
-		string input, lol;
+		string input, lol, efn=extract_file_name(file_name);
 		int i=2;
 		switch(color_scheme)
 		{
-			case sublime: output << "<html>\n<head>\n<meta charset=\"utf-8\">\n<style>\ndiv:after\n{\n	content: \".\";\n	display: inline-block;\n	clear: both;\n	visibility: hidden;\n	line-height: 0;\n	height: 0;\n}\n\ndiv\n{\n	display: inline-block;\n}\n\nbody\n{\n  background: #272822;\n  color: #f8f8f2;\n  font-family: Helvetica, Arial, sans-serif;\n  font-size: 14px;\n}\n.code\n{\n  width: 100%;\n  border: 2px solid #49483e;\n  border-radius: 4px;\n}\n\n.cpp_code\n{\n  text-align: left;\n	margin: 0;\n  margin-left: 0px;\n  overflow: auto;\n  padding-left: 1em;\n  padding-bottom: 5px;\n  padding-top: 5px;\n  padding-right: 5px;\n  border-left: 2px solid #49483e;\n}\n\n.num_lines\n{\n  color: #8f908a;\n  float: left;\n  margin: 0px;\n  text-align: right;\n  padding-left: 3px;\n  padding-right: 5px;\n  padding-bottom: 5px;\n  padding-top: 5px;\n}\n\n.p1{color: #a6e22e;}\n.p2{color: #ff9b4b;}\n.p3{color: #f92672;}\n.p4{color: #66d9ef;font-style: italic;}\n.p41{color: #66d9ef;}\n.p42{color: #a6e22e;}\n.p5{color: #b15555;}\n.p6{color: #ae81ff;}\n.p7{color: #e6db74;}\n.p71{color: #e6db74;}\n.p8{color: #75715e;}\n.p9{color: #3c74ec;}\n</style>\n</head>\n<body>\n<div class=\"code\">\n<pre class=\"num_lines\">\n";break;
-			case codeblocks: output << "<html>\n<head>\n<meta charset=\"utf-8\">\n<style>\ndiv:after\n{\n	content: \".\";\n	display: inline-block;\n	clear: both;\n	visibility: hidden;\n	line-height: 0;\n	height: 0;\n}\n\ndiv\n{\n	display: inline-block;\n}\n\nbody\n{\n  background: #ffffff;\n  color: #000000;\n  font-family: Helvetica, Arial, sans-serif;\n  font-size: 14px;\n}\n.code\n{\n  width: 100%;\n  border: 1px solid #afafaf;\n  border-radius: 4px;\n}\n\n.cpp_code\n{\n  text-align: left;\n	margin: 0;\n  margin-left: 0px;\n  overflow: auto;\n  padding-left: 1em;\n  padding-bottom: 5px;\n  padding-top: 5px;\n  padding-right: 5px;\n  border-left: 1px solid #afafaf;\n}\n\n.num_lines\n{\n  color: #4c4c4c;\n  float: left;\n  margin: 0px;\n  text-align: right;\n  padding-left: 3px;\n  padding-right: 5px;\n  padding-bottom: 5px;\n  padding-top: 5px;\n}\n\n.p1{color: #00a000;}\n.p2{color: #e20deb;font-weight: bold;}\n.p3{color: #0000ff;font-weight: bold;}\n.p4{color: #0000ff;font-weight: bold;}\n.p41{color: #1c8ce5;font-weight: bold;}\n.p42{color: #e20deb;font-weight: bold;}\n.p5{color: #ff0000;}\n.p6{color: #f000f0;}\n.p7{color: #0000ff;}\n.p71{color: #e0a000;}\n.p8{color: #a0a0a0;}\n.p9{color: #00a000;font-weight: bold;}\n</style>\n</head>\n<body>\n<div class=\"code\">\n<pre class=\"num_lines\">\n";break;
+			case sublime: output << "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Source code of "+efn+"</title>\n<style>\ndiv:after\n{\n  content: \".\";\n  display: inline-block;\n  clear: both;\n  visibility: hidden;\n  line-height: 0;\n  height: 0;\n}\n\ndiv\n{\n  display: inline-block;\n}\n\nbody\n{\n  background: #272822;\n  color: #f8f8f2;\n  font-family: Helvetica, Arial, sans-serif;\n  font-size: 14px;\n}\n.code\n{\n  width: 100%;\n  border: 2px solid #49483e;\n  border-radius: 4px;\n}\n\n.cpp_code\n{\n  text-align: left;\n  margin: 0;\n  margin-left: 0px;\n  overflow: auto;\n  padding-left: 1em;\n  padding-bottom: 5px;\n  padding-top: 5px;\n  padding-right: 5px;\n  border-left: 2px solid #49483e;\n}\n\n.num_lines\n{\n  color: #8f908a;\n  float: left;\n  margin: 0px;\n  text-align: right;\n  padding-left: 3px;\n  padding-right: 5px;\n  padding-bottom: 5px;\n  padding-top: 5px;\n}\n\n.p1{color: #a6e22e;}\n.p2{color: #ff9b4b;}\n.p3{color: #f92672;}\n.p4{color: #66d9ef;font-style: italic;}\n.p41{color: #66d9ef;}\n.p42{color: #a6e22e;}\n.p5{color: #b15555;}\n.p6{color: #ae81ff;}\n.p7{color: #e6db74;}\n.p71{color: #e6db74;}\n.p8{color: #75715e;}\n.p9{color: #3c74ec;}\n</style>\n</head>\n<body>\n<div class=\"code\">\n<pre class=\"num_lines\">\n";break;
+			case codeblocks: output << "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Source code of "+efn+"</title>\n<style>\ndiv:after\n{\n  content: \".\";\n  display: inline-block;\n  clear: both;\n  visibility: hidden;\n  line-height: 0;\n  height: 0;\n}\n\ndiv\n{\n  display: inline-block;\n}\n\nbody\n{\n  background: #ffffff;\n  color: #000000;\n  font-family: Helvetica, Arial, sans-serif;\n  font-size: 14px;\n}\n.code\n{\n  width: 100%;\n  border: 1px solid #afafaf;\n  border-radius: 4px;\n}\n\n.cpp_code\n{\n  text-align: left;\n  margin: 0;\n  margin-left: 0px;\n  overflow: auto;\n  padding-left: 1em;\n  padding-bottom: 5px;\n  padding-top: 5px;\n  padding-right: 5px;\n  border-left: 1px solid #afafaf;\n}\n\n.num_lines\n{\n  color: #4c4c4c;\n  float: left;\n  margin: 0px;\n  text-align: right;\n  padding-left: 3px;\n  padding-right: 5px;\n  padding-bottom: 5px;\n  padding-top: 5px;\n}\n\n.p1{color: #00a000;}\n.p2{color: #e20deb;font-weight: bold;}\n.p3{color: #0000ff;font-weight: bold;}\n.p4{color: #0000ff;font-weight: bold;}\n.p41{color: #1c8ce5;font-weight: bold;}\n.p42{color: #e20deb;font-weight: bold;}\n.p5{color: #ff0000;}\n.p6{color: #f000f0;}\n.p7{color: #0000ff;}\n.p71{color: #e0a000;}\n.p8{color: #a0a0a0;}\n.p9{color: #00a000;font-weight: bold;}\n</style>\n</head>\n<body>\n<div class=\"code\">\n<pre class=\"num_lines\">\n";break;
 		}
 		if(!file.eof())
 		{
