@@ -173,7 +173,7 @@ int main(int argc, char **argv)
 	parser::parse_file(file_name);
 	// ------------------
 	fstream file(file_name.c_str(), ios_base::in), output;
-	if(!file.good()) cerr << "Connot open file!" << endl;
+	if(!file.good()) cerr << "Cannot open file!" << endl;
 	else
 	{
 		output.open((file_name+".html").c_str(), ios_base::out);
