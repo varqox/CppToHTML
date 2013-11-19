@@ -157,7 +157,7 @@ int main(int argc, char **argv)
 	// path
 	if(file_name[0]!='/')
 	{
-		if(system("pwd > lol.shell"));
+		system("pwd > lol.shell");
 		fstream lol("lol.shell", ios_base::in);
 		string path;
 		if(lol.good())
@@ -165,7 +165,7 @@ int main(int argc, char **argv)
 			getline(lol, path);
 			lol.close();
 		}
-		if(system("rm -f lol.shell"));
+		system("rm -f lol.shell");
 		if(*--path.end()!='/') path+='/';
 		file_name=path+file_name;
 	}

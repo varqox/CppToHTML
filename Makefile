@@ -1,12 +1,14 @@
-CXX=g++
-CXXFLAGS=-Wall -s -O3 -m32
-RM= rm -f
+CXX = clang++
+LINK = clang++
+CXXFLAGS = -O3
+LFLAGS = -s -O3
+RM = rm -f
 
 .PHONY: all clean
 all: cth
 
 cth: main.o aho.o parser.o synax_highlight.o
-	$(CXX) $(CXXFLAGS) $^ -o $@
+	$(LINK) $(LFLAGS) $^ -o $@
 
 main.o: main.cpp main.hpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
