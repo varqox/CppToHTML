@@ -206,8 +206,8 @@ namespace synax_highlight
 			{
 				ret+=synax_highlight(rest, i);
 				rest="";
-				ret+="<span class=\"p8\">/*";
-				i+=2;
+				ret+=string("<span class=\"p8\">/*")+code[i+2];
+				i+=3;
 				while(i<cl && !(code[i-1]=='*' && code[i]=='/'))
 				{
 					switch(code[i])

@@ -1,171 +1,169 @@
 #include <iostream>
-#include <fstream>
+#include <fstream> //trololo
+#include <cstring>
 #include <vector>
 
 using namespace std;
 
-void parse(const string& code, ostream& output)
+namespace span
 {
-	for(int cl=code.size(), i=0; i<cl; ++i)
+	const char
+	preprocessor[]="<span style=\"color: #00a000\">",
+	comment[]="<span style=\"color: #a0a0a0\">",
+	string[]="<span style=\"color: #0000ff\">",
+	character[]="<span style=\"color: #0000ff\">",
+	special_character[]="<span style=\"color: #f000f0\">",
+	number[]="<span style=\"color: #f000f0\">",
+	keyword[]="<span style=\"\">",
+	type[]="<span style=\"\">",
+	function[]="<span style=\"\">",
+	end[]="</span>";
+}
+
+const bool is_name[256]={false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+
+inline string safe_character(char _c)
+{
+	if(_c=='<') return "&lt";
+	if(_c=='>') return "&gt";
+	if(_c=='&') return "&amp";
+	return string(&_c, 1);
+}
+
+string synax_highlight(const string& code)
+{
+	string out;
+	for(string::const_iterator i=code.begin(); i!=code.end(); ++i)
+		out+=safe_character(*i);
+	return out;
+}
+
+void color_code(const string& code, ostream& output)
+{
+	string to_syn_high;
+	for(int code_len=code.size(), i=0; i<code_len; ++i)
 	{
 		if(code[i]=='#') // preprocessor
 		{
-			/*ret+=synax_highlight(rest, i);
-			rest="";
-			ret+="<span class=\"p1\">#";
-			bool in_quotation=false, is_include=false;
-			while(++i<cl && code[i]!='\n' && (code[i]==' ' || code[i]=='\\'))
+			output << synax_highlight(to_syn_high);
+			to_syn_high="";
+			output << span::preprocessor << code[i];
+			while(++i<code_len && code[i]!='\n')
 			{
-				if(i+1<cl && code[i]=='\\' && code[i+1]=='\n')
+				if(i+1<code_len && 0==memcmp(code.c_str()+i, "\\\n", 2))
 				{
-					ret+="\\\n";
+					output << "\\\n";
 					++i;
 				}
 				else
-					switch(code[i])
-					{
-						case '<': ret+="&lt;";break;
-						case '>': ret+="&gt;";break;
-						case '&': ret+="&amp;";break;
-						default: ret+=code[i];
-					}
+					output << safe_character(code[i]);
 			}
-			if(code[i]!='\n' && i+6<cl && code[i]=='i' && code[i+1]=='n' && code[i+2]=='c' && code[i+3]=='l' && code[i+4]=='u' && code[i+5]=='d' && code[i+6]=='e') is_include=true;
-			while(i<cl && code[i]!='\n')
-			{
-				if(i+1<cl && code[i]=='\\' && code[i+1]=='\n')
-				{
-					ret+="\\\n";
-					++i;
-				}
-				else
-				{
-					if(is_include)
-						switch(code[i])
-						{
-							case '<': ret+="<span class=\"p7\">&lt;";break;
-							case '>': ret+="&gt;</span>";break;
-							case '"': ret+=(in_quotation^=true) ? "<span class=\"p7\">\"":"\"</span>";break;
-							case '&': ret+="&amp;";break;
-							default: ret+=code[i];
-						}
-					else
-						switch(code[i])
-						{
-							case '<': ret+="&lt;";break;
-							case '>': ret+="&gt;";break;
-							case '&': ret+="&amp;";break;
-							default: ret+=code[i];
-						}
-				}
-				++i;
-			}
-			ret+="</span>";
-			--i;*/
+			--i;
+			output << span::end;
 		}
-		else if(i+1<cl && code[i]=='/' && code[i+1]=='/') // oneline comment
+		else if(i+1<code_len && code[i]=='/' && code[i+1]=='/') // oneline comment
 		{
-			/*ret+=synax_highlight(rest, i);
-			rest="";
-			ret+="<span class=\"p8\">";
-			while(i<cl && code[i]!='\n')
-			{
-				switch(code[i])
-				{
-					case '<': ret+="&lt;";break;
-					case '>': ret+="&gt;";break;
-					case '&': ret+="&amp;";break;
-					default: ret+=code[i];
-				}
-				++i;
-			}
-			ret+="</span>";
-			--i;*/
+			output << synax_highlight(to_syn_high);
+			to_syn_high="";
+			output << span::comment << code[i];
+			while(++i<code_len && code[i]!='\n')
+				output << safe_character(code[i]);
+			--i;
+			output << span::end;
 		}
-		else if(i+1<cl && code[i]=='/' && code[i+1]=='*') // multiline comment
+		else if(i+1<code_len && code[i]=='/' && code[i+1]=='*') // multiline comment
 		{
-			/*ret+=synax_highlight(rest, i);
-			rest="";
-			ret+="<span class=\"p8\">/*";
+			output << synax_highlight(to_syn_high);
+			to_syn_high="";
+			output << span::comment << "/*";
 			i+=2;
-			while(i<cl && !(code[i-1]=='*' && code[i]=='/'))
-			{
-				switch(code[i])
-				{
-					case '<': ret+="&lt;";break;
-					case '>': ret+="&gt;";break;
-					case '&': ret+="&amp;";break;
-					default: ret+=code[i];
-				}
-				++i;
-			}
-			if(i<cl) // if comment ending
-				ret+='/';
-			ret+="</span>";*/
+			if(i<code_len) output << safe_character(code[i]);
+			while(++i<code_len && 0!=memcmp(code.c_str()+i-1, "*/", 2))
+				output << safe_character(code[i]);
+			output << '/' << span::end;
 		}
 		else if(code[i]=='"' || code[i]=='\'') // strings and chars
 		{
-			/*ret+=synax_highlight(rest, i);
-			rest="";
+			output << synax_highlight(to_syn_high);
+			to_syn_high="";
 			unsigned char str_or_char=code[i];
-			ret+="<span class=\"p"+string(str_or_char=='\'' ? "71":"7")+"\">";
-			ret+=str_or_char;
-			++i;
-			while(i<cl && code[i]!=str_or_char)
+			output << (str_or_char=='\'' ? span::character : span::string) << code[i];
+			while(++i<code_len && code[i]!=str_or_char)
 			{
 				if(code[i]=='\\')
 				{
-					++i;
-					ret+="<span class=\"p6\">\\";
-					if(i<cl)
-					{
-						switch(code[i])
-						{
-							case '<': ret+="&lt;";break;
-							case '>': ret+="&gt;";break;
-							case '&': ret+="&amp;";break;
-							default: ret+=code[i];
-						}
-					}
-					ret+="</span>";
+					output << span::special_character << '\\';
+					if(++i<code_len)
+						output << safe_character(code[i]);
+					output << span::end;
 				}
 				else
-				{
-					switch(code[i])
-					{
-						case '<': ret+="&lt;";break;
-						case '>': ret+="&gt;";break;
-						case '&': ret+="&amp;";break;
-						default: ret+=code[i];
-					}
-				}
-				++i;
+					output << safe_character(code[i]);
 			}
-			ret+=str_or_char;
-			ret+="</span>";*/
+			output << str_or_char << span::end;
 		}
-		else ;//rest+=code[i];
+		else if(code[i]>='0' && code[i]<='9' && (i==0 || !is_name[static_cast<unsigned char>(code[i-1])])) // numbers
+			{
+				{
+					output << synax_highlight(to_syn_high);
+					to_syn_high="";
+					output << span::number << code[i];
+					bool point=false;
+					while(++i<code_len && ((code[i]>='0' && code[i]<='9') || code[i]=='.'))
+					{
+						if(code[i]=='.')
+						{
+							if(point) break;
+							point=true;
+						}
+						output << code[i];
+					}
+					if(i<code_len && code[i]=='L')
+					{
+						output << 'L';
+						if(++i<code_len && code[i]=='L')
+						{
+							output << 'L';
+							++i;
+						}
+					}
+					--i;
+					output << span::end;
+				}
+			}
+		else to_syn_high+=code[i];
 	}
+	output << synax_highlight(to_syn_high);
 }
 
-int main()
+int main(int argc, char** argv)
 {
 	ios_base::sync_with_stdio(false);
-	string file_name;
-	cin >> file_name;
+	if(argc<2)
+	{
+		cerr << "Usage:\ncr <file name>" << endl;
+		return 1;
+	}
+	string file_name=argv[1];
+	// cin >> file_name;
 	fstream file(file_name.c_str(), ios::in);
 	if(file.good())
 	{
-		fstream out((file_name+'1').c_str(), ios::out);
+		fstream out((file_name+".html").c_str(), ios::out);
+		out << "<table style=\"border-spacing: 0;\ndisplay: inline-block;\nfont-size: 14px;\nfont-family: monospace;\nline-height: 17px;\nborder: 1px solid #afafaf;\nborder-radius: 4px;\">\n<tbody>\n<tr>\n<td style=\"padding: 0\">\n<pre style=\"color: #4c4c4c;\nmargin: 0;\ntext-align: right;\npadding: 5px 4px 5px 4px;border-right: 1px solid #afafaf\">\n1\n";
 		string input, tmp;
 		getline(file, input);
+		unsigned line=1;
 		while(file.good())
 		{
+			out << ++line << '\n';
 			input+='\n';
 			getline(file, tmp);
 			input+=tmp;
 		}
-		parse(input, out);
+		out << "</pre>\n</td>\n<td style=\"padding: 0\">\n<pre style=\"text-align: left;margin: 0;padding: 5px 5px 5px 1em\">\n";
+		color_code(input, out);
+		out << "</pre></td></tr></tbody></table>";
 	}
 	else cout << "Cannot open file" << endl;
 return 0;
