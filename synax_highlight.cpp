@@ -59,11 +59,11 @@ namespace synax_highlight
 		{
 			make_changes(x+i-code.size());
 			//if pattern isn't included in any name (front)
-			if(_aho.fin[i]!=0 && (_aho.tree.graph[_aho.fin[i]].color==5 || _aho.tree.graph[_aho.fin[i]].color==2 || i==0 || !is_name[static_cast<int>(code[i-1])]))
+			if(_aho.fin[i]!=0 && (_aho.tree.graph[_aho.fin[i]].color==5 || _aho.tree.graph[_aho.fin[i]].color==2 || i==0 || !is_true_name[static_cast<int>(code[i-1])]))
 			{
 				int end=i+_aho.tree.graph[_aho.fin[i]].depth;
 				//if pattern is included in any name (end)
-				if(_aho.tree.graph[_aho.fin[i]].color!=2 && _aho.tree.graph[_aho.fin[i]].color!=5 && (end>=cl || is_name[static_cast<int>(code[end])]))
+				if(_aho.tree.graph[_aho.fin[i]].color!=2 && _aho.tree.graph[_aho.fin[i]].color!=5 && (end>=cl || is_true_name[static_cast<int>(code[end])]))
 				{
 					switch(code[i])
 					{
