@@ -3,17 +3,17 @@
 namespace synax_highlight
 {
 	aho _aho;
-	void make_tree()
+	void make_trie()
 	{
 		switch(color_scheme)
 		{
 			case sublime:
-				_aho.tree.add_word("true", 0, 6);
-				_aho.tree.add_word("false", 0, 6);
+				_aho.trie.add_word("true", 0, 6);
+				_aho.trie.add_word("false", 0, 6);
 				break;
 			case codeblocks:
-				_aho.tree.add_word("true", 0, 4);
-				_aho.tree.add_word("false", 0, 4);
+				_aho.trie.add_word("true", 0, 4);
+				_aho.trie.add_word("false", 0, 4);
 				break;
 		}
 		fstream keys_file("patterns/red_keys.txt", ios::in);
@@ -21,31 +21,31 @@ namespace synax_highlight
 		while(keys_file.good())
 		{
 			getline(keys_file,key);
-			_aho.tree.add_word(key, 0, 5);
+			_aho.trie.add_word(key, 0, 5);
 		}
 		keys_file.close();
 		keys_file.open("patterns/keywords.txt", ios::in);
 		while(keys_file.good())
 		{
 			getline(keys_file,key);
-			_aho.tree.add_word(key, 0, 3);
+			_aho.trie.add_word(key, 0, 3);
 		}
 		keys_file.close();
 		keys_file.open("patterns/types.txt", ios::in);
 		while(keys_file.good())
 		{
 			getline(keys_file,key);
-			_aho.tree.add_word(key, 0, 4);
+			_aho.trie.add_word(key, 0, 4);
 		}
 		keys_file.close();
-		_aho.tree.add_fails(); // add fails edges
+		_aho.trie.add_fails(); // add fails edges
 	}
 
 	void make_changes(int i)
 	{
 		while(!parser::changs.empty() && parser::changs.front().pos<=i)
 		{
-			_aho.tree.graph[parser::changs.front().id].color=parser::changs.front().color;
+			_aho.trie.graph[parser::changs.front().id].color=parser::changs.front().color;
 			parser::changs.pop();
 		}
 	}
@@ -59,11 +59,11 @@ namespace synax_highlight
 		{
 			make_changes(x+i-code.size());
 			//if pattern isn't included in any name (front)
-			if(_aho.fin[i]!=0 && (_aho.tree.graph[_aho.fin[i]].color==5 || _aho.tree.graph[_aho.fin[i]].color==2 || i==0 || !is_true_name[static_cast<int>(code[i-1])]))
+			if(_aho.fin[i]!=0 && (_aho.trie.graph[_aho.fin[i]].color==5 || _aho.trie.graph[_aho.fin[i]].color==2 || i==0 || !is_true_name[static_cast<int>(code[i-1])]))
 			{
-				int end=i+_aho.tree.graph[_aho.fin[i]].depth;
+				int end=i+_aho.trie.graph[_aho.fin[i]].depth;
 				//if pattern is included in any name (end)
-				if(_aho.tree.graph[_aho.fin[i]].color!=2 && _aho.tree.graph[_aho.fin[i]].color!=5 && (end>=cl || is_true_name[static_cast<int>(code[end])]))
+				if(_aho.trie.graph[_aho.fin[i]].color!=2 && _aho.trie.graph[_aho.fin[i]].color!=5 && (end>=cl || is_true_name[static_cast<int>(code[end])]))
 				{
 					switch(code[i])
 					{
@@ -90,10 +90,10 @@ namespace synax_highlight
 						ret+="</span>";
 					}
 				}
-				else if(_aho.tree.graph[_aho.fin[i]].color!=5 || (code[i]!='*' && code[i]!='&'))
-					old_color=_aho.tree.graph[_aho.fin[i]].color;
-				//cout << _aho.fin[i] << "{ " << _aho.tree.graph[_aho.fin[i]].color+0 << endl;
-				ret+="<span class=\"p"+to_string(_aho.tree.graph[_aho.fin[i]].color)+"\">";
+				else if(_aho.trie.graph[_aho.fin[i]].color!=5 || (code[i]!='*' && code[i]!='&'))
+					old_color=_aho.trie.graph[_aho.fin[i]].color;
+				//cout << _aho.fin[i] << "{ " << _aho.trie.graph[_aho.fin[i]].color+0 << endl;
+				ret+="<span class=\"p"+to_string(_aho.trie.graph[_aho.fin[i]].color)+"\">";
 				for(; i<end; ++i)
 				{
 					switch(code[i])
@@ -124,7 +124,7 @@ namespace synax_highlight
 	string code_coloring(const string& code) // coloring comments, preprocessor, chars and strings
 	{
 		parser::parse(code);
-		make_tree();
+		make_trie();
 		string ret, rest;
 		for(int cl=code.size(), i=0; i<cl; ++i)
 		{

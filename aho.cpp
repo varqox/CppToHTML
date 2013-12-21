@@ -1,11 +1,11 @@
 #include "main.hpp"
 
-aho::aho_tree::aho_tree(): graph(1) // add root
+aho::aho_trie::aho_trie(): graph(1) // add root
 {
 	this->graph[0].fail=this->graph[0].long_sh_pat=0; // max shorter pattern isn't exist
 }
 
-int aho::aho_tree::add_word(const string& word, int id, unsigned char color)
+int aho::aho_trie::add_word(const string& word, int id, unsigned char color)
 {
 	int ver=0; // actual node (vertex)
 	for(int s=word.size(), i=0; i<s; ++i)
@@ -24,7 +24,7 @@ int aho::aho_tree::add_word(const string& word, int id, unsigned char color)
 return ver;
 }
 
-void aho::aho_tree::add_fails() // and the longest shorter patterns, based on BFS algorithm
+void aho::aho_trie::add_fails() // and the longest shorter patterns, based on BFS algorithm
 {
 	queue<int> V;
 	// add root childrens
@@ -68,29 +68,29 @@ void aho::find(const string& text, int x)
 	{
 		while(!this->troll.empty() && this->troll.front().pos<=x+i-text.size())
 		{
-			tree.graph[this->troll.front().id].is_pattern=this->troll.front().is_pattern;
+			trie.graph[this->troll.front().id].is_pattern=this->troll.front().is_pattern;
 			this->troll.pop();
 		}
 		//--------------------------------------
-		while(act>0 && tree.graph[act].E[static_cast<int>(text[i])]==0)
-			act=tree.graph[act].fail; // while we can't add text[i] to path, go to fail node
-		if(tree.graph[act].E[static_cast<int>(text[i])]!=0) // if we can add text[i] to path
-			act=tree.graph[act].E[static_cast<int>(text[i])];
-		if(tree.graph[act].is_pattern) // if actual node is pattern, then add it to fin
+		while(act>0 && trie.graph[act].E[static_cast<int>(text[i])]==0)
+			act=trie.graph[act].fail; // while we can't add text[i] to path, go to fail node
+		if(trie.graph[act].E[static_cast<int>(text[i])]!=0) // if we can add text[i] to path
+			act=trie.graph[act].E[static_cast<int>(text[i])];
+		if(trie.graph[act].is_pattern) // if actual node is pattern, then add it to fin
 		{
-			this->fin[i-tree.graph[act].depth+1]=act;
+			this->fin[i-trie.graph[act].depth+1]=act;
 		}
 		else
 		{
-			pat=tree.graph[act].long_sh_pat; // go to the pattern node
+			pat=trie.graph[act].long_sh_pat; // go to the pattern node
 			while(pat>0) // finding the longest pattern
 			{
-				if(tree.graph[pat].is_pattern)
+				if(trie.graph[pat].is_pattern)
 				{
-					this->fin[i-tree.graph[pat].depth+1]=pat; // add pat node to fin
+					this->fin[i-trie.graph[pat].depth+1]=pat; // add pat node to fin
 					break;
 				}
-				pat=tree.graph[pat].long_sh_pat; // go to the next pattern
+				pat=trie.graph[pat].long_sh_pat; // go to the next pattern
 			}
 		}
 	}

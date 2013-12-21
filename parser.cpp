@@ -89,14 +89,14 @@ namespace parser // anslysing code
 
 	void init()
 	{
-		_aho.tree.add_word("class",0,0);
-		_aho.tree.add_word("struct",1,0);
-		_aho.tree.add_word("union",2,0);
-		_aho.tree.add_word("enum",3,0);
-		_aho.tree.add_word("namespace",4,0);
-		_aho.tree.add_word("typename",5,0);
-		_aho.tree.add_word("typedef",6,0);
-		_aho.tree.add_fails(); // add fails edges
+		_aho.trie.add_word("class",0,0);
+		_aho.trie.add_word("struct",1,0);
+		_aho.trie.add_word("union",2,0);
+		_aho.trie.add_word("enum",3,0);
+		_aho.trie.add_word("namespace",4,0);
+		_aho.trie.add_word("typename",5,0);
+		_aho.trie.add_word("typedef",6,0);
+		_aho.trie.add_fails(); // add fails edges
 	}
 
 	string absolute_path(const string& path)
@@ -244,7 +244,7 @@ namespace parser // anslysing code
 			if(_aho.fin[i]!=0)
 			{
 				type="";
-				switch(_aho.tree.graph[_aho.fin[i]].pattern_id)
+				switch(_aho.trie.graph[_aho.fin[i]].pattern_id)
 				{
 					case 0:
 						ps=i;
@@ -259,13 +259,13 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,9);
+							id=synax_highlight::_aho.trie.add_word(type,0,9);
 							if(add_changs)
 							{
 								changs.push(change(ps,id,2));
 								changs.push(change(i,id,9));
 							}
-							synax_highlight::_aho.tree.add_word(type+"::",0,2);
+							synax_highlight::_aho.trie.add_word(type+"::",0,2);
 						}
 						break;
 					case 1:
@@ -281,13 +281,13 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,9);
+							id=synax_highlight::_aho.trie.add_word(type,0,9);
 							if(add_changs)
 							{
 								changs.push(change(ps,id,2));
 								changs.push(change(i,id,9));
 							}
-							synax_highlight::_aho.tree.add_word(type+"::",0,2);
+							synax_highlight::_aho.trie.add_word(type+"::",0,2);
 						}
 						break;
 					case 2:
@@ -303,13 +303,13 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,9);
+							id=synax_highlight::_aho.trie.add_word(type,0,9);
 							if(add_changs)
 							{
 								changs.push(change(ps,id,2));
 								changs.push(change(i,id,9));
 							}
-							synax_highlight::_aho.tree.add_word(type+"::",0,2);
+							synax_highlight::_aho.trie.add_word(type+"::",0,2);
 						}
 						break;
 					case 3:
@@ -325,7 +325,7 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,9);
+							id=synax_highlight::_aho.trie.add_word(type,0,9);
 							if(add_changs)
 							{
 								changs.push(change(ps,id,2));
@@ -346,7 +346,7 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,9);
+							id=synax_highlight::_aho.trie.add_word(type,0,9);
 							// synax_highlight::_aho.troll.push(aho::ch_pat(i-1,id,true));
 							// synax_highlight::_aho.troll.push(aho::ch_pat(i,id,false));
 							if(add_changs)
@@ -354,7 +354,7 @@ namespace parser // anslysing code
 								changs.push(change(ps,id,2));
 								changs.push(change(i,id,4));
 							}
-							synax_highlight::_aho.tree.add_word(type+"::",0,2);
+							synax_highlight::_aho.trie.add_word(type+"::",0,2);
 						}
 						break;
 					case 5:
@@ -370,13 +370,13 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,9);
+							id=synax_highlight::_aho.trie.add_word(type,0,9);
 							if(add_changs)
 							{
 								changs.push(change(ps,id,2));
 								changs.push(change(i,id,9));
 							}
-							synax_highlight::_aho.tree.add_word(type+"::",0,2);
+							synax_highlight::_aho.trie.add_word(type+"::",0,2);
 						}
 						break;
 					case 6:
@@ -399,13 +399,13 @@ namespace parser // anslysing code
 						}
 						if(!type.empty())
 						{
-							id=synax_highlight::_aho.tree.add_word(type,0,9);
+							id=synax_highlight::_aho.trie.add_word(type,0,9);
 							if(add_changs)
 							{
 								changs.push(change(ps,id,2));
 								changs.push(change(i,id,9));
 							}
-							synax_highlight::_aho.tree.add_word(type+"::",0,2);
+							synax_highlight::_aho.trie.add_word(type+"::",0,2);
 						}
 						break;
 				}

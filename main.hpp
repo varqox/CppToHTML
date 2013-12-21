@@ -24,7 +24,7 @@ p9 - blue
 class aho
 {
 public:
-	class aho_tree
+	class aho_trie
 	{
 	public:
 		struct node
@@ -43,13 +43,13 @@ public:
 
 		vector<node> graph;
 
-		aho_tree();
-		~aho_tree(){}
+		aho_trie();
+		~aho_trie(){}
 		int add_word(const string& word, int id, unsigned char color);
 		void add_fails(); // and the longest shorter patterns, based on BFS algorithm
 	};
 
-	aho_tree tree;
+	aho_trie trie;
 	vector<int> fin;
 
 	struct ch_pat
@@ -110,7 +110,7 @@ namespace synax_highlight
 {
 	extern aho _aho;
 
-	void make_tree();
+	void make_trie();
 	void make_changes(int i);
 	string synax_highlight(const string& code, int x);
 	string code_coloring(const string& code); // coloring comments, preprocesor, chars and strings
