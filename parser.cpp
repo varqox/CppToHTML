@@ -197,8 +197,8 @@ namespace parser // anslysing code
 						{
 							while(code[++i]!='>')
 								incl+=code[i];
-							for(vector<string>::iterator i=include_directories.begin(); i!=include_directories.end(); ++i)
-								files.push(*i+(*--(i->end())=='/' ? "":"/")+incl);
+							for(vector<string>::iterator j=include_directories.begin(); j!=include_directories.end(); ++j)
+								files.push(*j+(*--(j->end())=='/' ? "":"/")+incl);
 						}
 					}
 					while(i<cl && code[i]!='\n')

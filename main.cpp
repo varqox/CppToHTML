@@ -134,7 +134,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	// make is_name array
-	is_true_name['_']=is_name['_']=true;
+	is_true_name[static_cast<unsigned char>('_')]=is_name[static_cast<unsigned char>('_')]=true;
 	for(int i='A'; i<='Z'; ++i)
 		is_true_name[i]=is_name[i]=true;
 	for(int i='a'; i<='z'; ++i)
