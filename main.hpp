@@ -33,7 +33,7 @@ public:
 			bool is_pattern; // is pattern end in this vertex
 			unsigned char color; // highlight color
 			unsigned char character; // this node character
-			node(unsigned char letter=0): is_pattern(false), character(letter)
+			node(unsigned char letter=0): fail(), long_sh_pat(), pattern_id(), depth(), is_pattern(false), color(), character(letter)
 			{
 				for(int i=0; i<256; ++i)
 					E[i]=0;
@@ -61,7 +61,7 @@ public:
 	};
 	queue<ch_pat> troll;
 
-	aho(){}
+	aho(): trie(), fin(), troll(){}
 	void find(const string&, int=0);
 	~aho(){}
 };
