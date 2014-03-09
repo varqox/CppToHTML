@@ -1,23 +1,47 @@
-ARCHITECTURE = 64
+export
+# Compile commands
+ifeq ($(shell clang > /dev/null 2> /dev/null; echo $$?), $(shell echo 1))
 CC = clang
+else
+CC = gcc
+endif
+ifeq ($(shell clang++ > /dev/null 2> /dev/null; echo $$?), $(shell echo 1))
 CXX = clang++
 LINK = clang++
-CFLAGS = -Wall -O3 -m$(ARCHITECTURE)
-CXXFLAGS = -Wall -O3 -m$(ARCHITECTURE)
-LFLAGS = -Wall -s -O3 -m$(ARCHITECTURE)
-RM = rm -f
-CP = cp -f
+else
+CXX = g++
+LINK = g++
+endif
 
-.PHONY: all clean
+CFLAGS = -Wall -Wextra -Wabi -Weffc++ -Wshadow -Wfloat-equal -Wno-unused-result -O3 -c
+CXXFLAGS := $(CFLAGS)
+LFLAGS = -Wall -Wextra -Wabi -Weffc++ -Wshadow -Wfloat-equal -Wno-unused-result -s -O3
+
+# Shell commands
+MV = mv -f
+CP = cp -f -r
+UPDATE = $(CP) -u
+RM = rm -f
+MKDIR = mkdir -p
+
+.PHONY: all debug clean clean-all
 
 all: cr
 
-cr: main.o
-	$(LINK) $(LFLAGS) $^ -o $@
+debug:
+	make all CXX='$(CXX) -DDEBUG' CC='$(CC) -DDEBUG'
 
-main.o: main.cpp
-	$(CXX) -c $(CXXFLAGS) $< -o $@
+cr: main.o aho.o
+	$(LINK) $^ $(LFLAGS) -o $@
 
-# clean
+main.o: main.cpp aho.hpp
+	$(CXX) $< $(CXXFLAGS) -o $@
+
+aho.o: aho.cpp aho.hpp
+	$(CXX) $< $(CXXFLAGS) -o $@
+
 clean:
 	$(RM) *.o
+
+mrproper: clean
+	$(RM) cr

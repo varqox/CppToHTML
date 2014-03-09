@@ -1,170 +1,191 @@
-#include <iostream>
-#include <fstream> //trololo
+#include "aho.hpp"
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <vector>
 
 using namespace std;
 
-namespace span
+#ifdef DEBUG
+#define D(...) __VA_ARGS__
+#else
+#define D(...)
+#endif
+
+#define LOG(x) D(cerr << #x << ": " << x << flush)
+#define LOGN(x) D(cerr << #x << ": " << x << endl)
+
+string file_get_contents(const char* name)
 {
-	const char
-	preprocessor[]="<span style=\"color: #00a000\">",
-	comment[]="<span style=\"color: #a0a0a0\">",
-	string[]="<span style=\"color: #0000ff\">",
-	character[]="<span style=\"color: #0000ff\">",
-	special_character[]="<span style=\"color: #f000f0\">",
-	number[]="<span style=\"color: #f000f0\">",
-	keyword[]="<span style=\"\">",
-	type[]="<span style=\"\">",
-	function[]="<span style=\"\">",
-	end[]="</span>";
+	FILE* f = fopen(name, "rb");
+	if(f == NULL)
+		perror("Cannot open file\n"), exit(1);
+	fseek(f, 0, SEEK_END);
+	size_t len = ftell(f);
+	rewind(f);
+	char *in = new char[len];
+	fread(in, sizeof(char), len, f);
+	fclose(f);
+	string out(in, in+len);
+	delete[] in;
+return out;
 }
 
-const bool is_name[256]={false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+// enum bracket_keyword{if, elseif, else, for, while/*, do, try, catch, switch*/};
 
-inline string safe_character(char _c)
+enum aho_classes
 {
-	if(_c=='<') return "&lt";
-	if(_c=='>') return "&gt";
-	if(_c=='&') return "&amp";
-	return string(&_c, 1);
+	left_space_operator,
+	right_space_operator,
+	space_operator,
+	no_space_operator
+};
+
+special_aho<aho_classes> _aho;
+
+void build__aho()
+{
+	string w1[]={},
+	w2[]={",", "new", "delete", "delete[]"},
+	w3[]={"=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "^=", "|=", "?", ":", "+", "-", "*", "/", "%", "<<", ">>", "<", "<=", ">", ">=", "==", "!=", "&", "^", "|", "&&", "||"},
+	w4[]={".", "::", ".*", "->", "->*", "~", "!", "++", "--", "[", "]", "(", ")"};
+	vector<pair<string, aho_classes> > patterns;
+	for(int s = sizeof(w1) / sizeof(string), i = 0; i < s; ++i)
+		patterns.push_back(make_pair(w1[i], left_space_operator));
+	for(int s = sizeof(w2) / sizeof(string), i = 0; i < s; ++i)
+		patterns.push_back(make_pair(w2[i], right_space_operator));
+	for(int s = sizeof(w3) / sizeof(string), i = 0; i < s; ++i)
+		patterns.push_back(make_pair(w3[i], space_operator));
+	for(int s = sizeof(w4) / sizeof(string), i = 0; i < s; ++i)
+		patterns.push_back(make_pair(w4[i], no_space_operator));
+	_aho.set_patterns(patterns);
 }
 
-string synax_highlight(const string& code)
+void reformat(const char * file)
 {
-	string out;
-	for(string::const_iterator i=code.begin(); i!=code.end(); ++i)
-		out+=safe_character(*i);
-	return out;
-}
-
-void color_code(const string& code, ostream& output)
-{
-	string to_syn_high;
-	for(int code_len=code.size(), i=0; i<code_len; ++i)
+	string code(file_get_contents(file)), out;
+	D(printf("%s\n", code.c_str());)
+	unsigned tabs = 0;
+	unsigned char last = '\n';
+	_aho.find(code);
+	for(unsigned i = 0, s = code.size(); i < s; ++i)
 	{
-		if(code[i]=='#') // preprocessor
+		if(code[i] == ' ' || code[i] == '\t' || code[i] == '\n')
+			continue;
+		if(code[i] == '#') // preprocessor
 		{
-			output << synax_highlight(to_syn_high);
-			to_syn_high="";
-			output << span::preprocessor << code[i];
-			while(++i<code_len && code[i]!='\n')
+			if(last == ';')
+				out += "\n\n";
+			out += '#';
+			while(++i < s && code[i] != '\n')
 			{
-				if(i+1<code_len && 0==memcmp(code.c_str()+i, "\\\n", 2))
-				{
-					output << "\\\n";
-					++i;
-				}
+				if(i + 1 < s && 0 == memcmp(code.c_str() + i, "\\\n", 2))
+					out += "\\\n", ++i;
 				else
-					output << safe_character(code[i]);
+					out += code[i];
 			}
-			--i;
-			output << span::end;
+			out += code[i];
+			last = '#';
 		}
-		else if(i+1<code_len && code[i]=='/' && code[i+1]=='/') // oneline comment
+		else if(i + 1 < s && code[i] == '/' && code[i + 1] == '/') // oneline comment
 		{
-			output << synax_highlight(to_syn_high);
-			to_syn_high="";
-			output << span::comment << code[i];
-			while(++i<code_len && code[i]!='\n')
-				output << safe_character(code[i]);
+			if(last == ';' || last == '{' || (last == '}' && code[i] != ';') || last == '#' || code[i] == '{')
+				out += '\n', out.append(tabs, '\t');
+			else if(i > 0 && last != ' ' && (code[i - 1] == ' ' || code[i - 1] == '\t' || code[i - 1] == '\n') && last != '{')
+				out += ' ';
+			out += code[i];
+			while(++i < s && code[i] != '\n')
+				out += code[i];
 			--i;
-			output << span::end;
 		}
-		else if(i+1<code_len && code[i]=='/' && code[i+1]=='*') // multiline comment
+		else if(i + 1 < s && code[i] == '/' && code[i + 1] == '*') // multiline comment
 		{
-			output << synax_highlight(to_syn_high);
-			to_syn_high="";
-			output << span::comment << "/*";
+			out += "/*";
 			i+=2;
-			if(i<code_len) output << safe_character(code[i]);
-			while(++i<code_len && 0!=memcmp(code.c_str()+i-1, "*/", 2))
-				output << safe_character(code[i]);
-			output << '/' << span::end;
+			if(i < s) out += code[i];
+			while(++i < s && 0 != memcmp(code.c_str() + i - 1, "*/", 2))
+				out += code[i];
+			out += '/';
 		}
-		else if(code[i]=='"' || code[i]=='\'') // strings and chars
+		else if(code[i] == '"' || code[i] == '\'') // strings and chars
 		{
-			output << synax_highlight(to_syn_high);
-			to_syn_high="";
-			unsigned char str_or_char=code[i];
-			output << (str_or_char=='\'' ? span::character : span::string) << code[i];
-			while(++i<code_len && code[i]!=str_or_char)
+			unsigned char str_or_char = code[i];
+			out += code[i];
+			while(++i < s && code[i] != str_or_char)
 			{
-				if(code[i]=='\\')
+				if(code[i] == '\\')
 				{
-					output << span::special_character << '\\';
-					if(++i<code_len)
-						output << safe_character(code[i]);
-					output << span::end;
+					out += '\\';
+					if(++i < s)
+						out += code[i];
 				}
 				else
-					output << safe_character(code[i]);
+					out += code[i];
 			}
-			output << str_or_char << span::end;
+			out += str_or_char;
 		}
-		else if(code[i]>='0' && code[i]<='9' && (i==0 || !is_name[static_cast<unsigned char>(code[i-1])])) // numbers
+		else
+		{
+			if(code[i] == '}')
 			{
-				{
-					output << synax_highlight(to_syn_high);
-					to_syn_high="";
-					output << span::number << code[i];
-					bool point=false;
-					while(++i<code_len && ((code[i]>='0' && code[i]<='9') || code[i]=='.'))
-					{
-						if(code[i]=='.')
-						{
-							if(point) break;
-							point=true;
-						}
-						output << code[i];
-					}
-					if(i<code_len && code[i]=='L')
-					{
-						output << 'L';
-						if(++i<code_len && code[i]=='L')
-						{
-							output << 'L';
-							++i;
-						}
-					}
-					--i;
-					output << span::end;
-				}
+				--tabs;
+				if(last == '{')
+					goto next1;
 			}
-		else to_syn_high+=code[i];
+			if(last == ';' || last == '{' || (last == '}' && code[i] != ';') || last == '#' || code[i] == '{')
+				out += '\n', out.append(tabs, '\t');
+			else if(i > 0 && last != ' ' && (code[i - 1] == ' ' || code[i - 1] == '\t' || code[i - 1] == '\n') && last != '{')
+				out += ' ';
+			if(code[i] == '{')
+				++tabs;
+		next1:
+			if(_aho[i] != -1)
+			{
+				if(_aho.pattern(_aho[i]).second == left_space_operator)
+				{
+					if(out.size() == 0 || *out.rbegin() != ' ')
+						out += ' ';
+					out += _aho.pattern(_aho[i]).first;
+					i += _aho.pattern(_aho[i]).first.size() - 1;
+					last = code[i];
+				}
+				else if(_aho.pattern(_aho[i]).second == right_space_operator)
+				{
+					out += _aho.pattern(_aho[i]).first;
+					out += last = ' ';
+					i += _aho.pattern(_aho[i]).first.size() - 1;
+				}
+				else if(_aho.pattern(_aho[i]).second == space_operator)
+				{
+					if(out.size() == 0 || *out.rbegin() != ' ')
+						out += ' ';
+					out += _aho.pattern(_aho[i]).first;
+					out += last = ' ';
+					i += _aho.pattern(_aho[i]).first.size() - 1;
+				}
+				else if(_aho.pattern(_aho[i]).second == no_space_operator)
+				{
+					out += _aho.pattern(_aho[i]).first;
+					i += _aho.pattern(_aho[i]).first.size() - 1;
+					last = code[i];
+				}
+				D(out += "\033[01;31m";out+=code[i];out+="\033[0m";)
+				continue;
+			}
+			out += last = code[i];
+		}
 	}
-	output << synax_highlight(to_syn_high);
+	printf("%s\n", out.c_str());
 }
 
-int main(int argc, char** argv)
+int main(int argc, char const **argv)
 {
-	ios_base::sync_with_stdio(false);
-	if(argc<2)
+	if(argc < 2)
 	{
-		cerr << "Usage:\ncr <file name>" << endl;
+		printf("Usage: cr [option]... <file>\nOptions:\n");
 		return 1;
 	}
-	string file_name=argv[1];
-	// cin >> file_name;
-	fstream file(file_name.c_str(), ios::in);
-	if(file.good())
-	{
-		fstream out((file_name+".html").c_str(), ios::out);
-		out << "<table style=\"border-spacing: 0;\ndisplay: inline-block;\nfont-size: 14px;\nfont-family: monospace;\nline-height: 17px;\nborder: 1px solid #afafaf;\nborder-radius: 4px;\">\n<tbody>\n<tr>\n<td style=\"padding: 0\">\n<pre style=\"color: #4c4c4c;\nmargin: 0;\ntext-align: right;\npadding: 5px 4px 5px 4px;border-right: 1px solid #afafaf\">\n1\n";
-		string input, tmp;
-		getline(file, input);
-		unsigned line=1;
-		while(file.good())
-		{
-			out << ++line << '\n';
-			input+='\n';
-			getline(file, tmp);
-			input+=tmp;
-		}
-		out << "</pre>\n</td>\n<td style=\"padding: 0\">\n<pre style=\"text-align: left;margin: 0;padding: 5px 5px 5px 1em\">\n";
-		color_code(input, out);
-		out << "</pre></td></tr></tbody></table>";
-	}
-	else cout << "Cannot open file" << endl;
-return 0;
+	build__aho();
+	reformat(argv[1]);
+	return 0;
 }
