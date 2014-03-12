@@ -31,6 +31,11 @@ string file_get_contents(const char* name)
 return out;
 }
 
+// is_name: [_A-Za-z]
+// is_true_name: [_A-Za-z0-9]
+const bool is_name[256]={false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+	is_true_name[256]={false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true,true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+
 // enum bracket_keyword{if, elseif, else, for, while/*, do, try, catch, switch*/};
 
 enum aho_classes
@@ -74,8 +79,8 @@ void reformat(const char * file)
 			continue;
 		if(code[i] == '#') // preprocessor
 		{
-			if(last == ';')
-				out += "\n\n";
+			if(last == '#' || last == ';'  || last == '{' || last == '}')
+				out += '\n', out.append((tabs == 0 ? 0 : tabs -1), '\t');
 			out += '#';
 			while(++i < s && code[i] != '\n')
 			{
@@ -84,7 +89,7 @@ void reformat(const char * file)
 				else
 					out += code[i];
 			}
-			out += code[i];
+			// out += code[i]; // We add '\n' later
 			last = '#';
 		}
 		else if(i + 1 < s && code[i] == '/' && code[i + 1] == '/') // oneline comment
@@ -129,8 +134,9 @@ void reformat(const char * file)
 			if(code[i] == '}')
 			{
 				--tabs;
-				if(last == '{')
-					goto next1;
+				if(last != '{')
+					out += '\n', out.append(tabs, '\t');
+				goto next1;
 			}
 			if(last == ';' || last == '{' || (last == '}' && code[i] != ';') || last == '#' || code[i] == '{')
 				out += '\n', out.append(tabs, '\t');
@@ -141,32 +147,35 @@ void reformat(const char * file)
 		next1:
 			if(_aho[i] != -1)
 			{
-				if(_aho.pattern(_aho[i]).second == left_space_operator)
+				const string& tmp = _aho.pattern(_aho[i]).first;
+				const aho_classes& _ac = _aho.pattern(_aho[i]).second;
+				if(_ac == left_space_operator)
 				{
 					if(out.size() == 0 || *out.rbegin() != ' ')
 						out += ' ';
-					out += _aho.pattern(_aho[i]).first;
-					i += _aho.pattern(_aho[i]).first.size() - 1;
+					out += tmp;
+					i += tmp.size() - 1;
 					last = code[i];
 				}
-				else if(_aho.pattern(_aho[i]).second == right_space_operator)
+				else if(_ac == right_space_operator)
 				{
-					out += _aho.pattern(_aho[i]).first;
-					out += last = ' ';
-					i += _aho.pattern(_aho[i]).first.size() - 1;
+					out += tmp;
+					if(!((i > 0 && (tmp == "new" || tmp == "delete" || tmp == "delete[]") && is_true_name[static_cast<unsigned char>(code[i-1])]) || (i+tmp.size() < s && (tmp == "new" || tmp == "delete") && is_true_name[static_cast<unsigned char>(code[i+tmp.size()])])))
+						out += last = ' ';
+					i += tmp.size() - 1;
 				}
-				else if(_aho.pattern(_aho[i]).second == space_operator)
+				else if(_ac == space_operator)
 				{
 					if(out.size() == 0 || *out.rbegin() != ' ')
 						out += ' ';
-					out += _aho.pattern(_aho[i]).first;
+					out += tmp;
 					out += last = ' ';
-					i += _aho.pattern(_aho[i]).first.size() - 1;
+					i += tmp.size() - 1;
 				}
-				else if(_aho.pattern(_aho[i]).second == no_space_operator)
+				else if(_ac == no_space_operator)
 				{
-					out += _aho.pattern(_aho[i]).first;
-					i += _aho.pattern(_aho[i]).first.size() - 1;
+					out += tmp;
+					i += tmp.size() - 1;
 					last = code[i];
 				}
 				D(out += "\033[01;31m";out+=code[i];out+="\033[0m";)
