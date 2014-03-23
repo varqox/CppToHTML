@@ -75,7 +75,7 @@ void reformat(const char * file)
 	_aho.find(code);
 	for(unsigned i = 0, s = code.size(); i < s; ++i)
 	{
-		if(code[i] == ' ' || code[i] == '\t' || code[i] == '\n')
+		if(code[i] == ' ' || code[i] == '\t' || code[i] == '\n' || code[i] == '\r')
 			continue;
 		if(code[i] == '#') // preprocessor
 		{
